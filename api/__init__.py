@@ -5,7 +5,7 @@ import sys
 
 from flask import jsonify, json, request
 from i2c import I2CBus
-from atlas_scientific.models import RequestResult, AtlasScientificResponse, AtlasScientificDeviceCompensationFactor
+from atlas_scientific.models import RequestResult, AtlasScientificResponse, AtlasScientificDeviceCompensationFactor, AtlasScientificDeviceCalibrationPoint
 from atlas_scientific.device import AtlasScientificDevice, AtlasScientificDeviceBus
 i2cbus = I2CBus()
 
@@ -128,6 +128,22 @@ def create_app():
 
         compensation_factors = (AtlasScientificDeviceCompensationFactor(json_list_item) for json_list_item in request.json)   
         device.set_measurement_compensation_factors(compensation_factors)
+
+        return app.response_class(
+            # TODO: create Ok response
+            status=200,
+            mimetype='application/json'
+        )
+
+    @app.route('/api/device/<address>/sample/calibration', methods=['PUT'])
+    def set_calibration_point(address):
+        api_log.info(f"[PUT]: /api/device/{address}/sample/calibration")
+        api_log.debug(f"Body: {request.json}")
+
+        device = device_bus.get_device_by_address(int(address))
+
+        calibration_point = AtlasScientificDeviceCalibrationPoint(request.json)   
+        device.set_calibration_point(calibration_point)
 
         return app.response_class(
             # TODO: create Ok response

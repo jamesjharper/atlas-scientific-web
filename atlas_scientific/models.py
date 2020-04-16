@@ -49,7 +49,6 @@ class AtlasScientificDeviceSample(object):
             value = float(device_response.attributes[unit_index])
             result.append(AtlasScientificDeviceSample(unit.symbol, value, unit.value_type, device_response.response_timestamp))
             unit_index = unit_index + 1
-
         return result
 
 class AtlasScientificDeviceCompensationFactors(object): 
@@ -64,3 +63,10 @@ class AtlasScientificDeviceCompensationFactor(object):
         self.factor = device_compensation_factor.get('factor', None)
         self.symbol = device_compensation_factor.get('symbol', None)
         self.value = device_compensation_factor.get('value', None)
+
+
+class AtlasScientificDeviceCalibrationPoint(object): 
+    def __init__(self, calibration_point):        
+        # TODO: throw error if values are missing
+        self.point = calibration_point.get('point', None)
+        self.actual_value = calibration_point.get('actual_value', None)

@@ -218,7 +218,7 @@ class DoDeviceTests(unittest.TestCase):
             ]
 
         # Act
-         # body should be a list of all the units to be enabled.
+        # body should be a list of all the units to be enabled.
         # Note, all other units not in this list will be disabled 
         request_body = ['Mg']
 

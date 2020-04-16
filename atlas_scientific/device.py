@@ -98,7 +98,7 @@ class AtlasScientificDevice(object):
             self.current_output_measurements = self.get_supported_output_measurements()
 
         # multi output device
-        else:          
+        else:
             supported_unit_codes = {u.unit_code:u for u in self.get_supported_output_measurements()}
             
             # Read the device's current output
@@ -110,7 +110,7 @@ class AtlasScientificDevice(object):
         return self.current_output_measurements
 
     def set_enabled_output_measurements(self, units):
-        # find all the measurements which currently enabled, and need to be disabled
+        # find all the measurements which currently are enabled, and need to be disabled
         current_enabled_units = set(m.unit_code for m in self.get_enabled_output_measurements())
         requested_units_to_enable = set((u.upper() for u in units))
 
@@ -152,6 +152,17 @@ class AtlasScientificDevice(object):
             command = factors.get(compensation_factor.factor.lower(), None).command
             self.__query(f'{command},{compensation_factor.value}', self.device_request_latency)
 
+    def set_calibration_point(self, calibration_point):
+        # TODO: needs input validation
+
+        if calibration_point.point:
+            self.__query_cal_point(calibration_point.point, calibration_point.actual_value)
+        else:
+            self.__query_cal(calibration_point.actual_value)
+
+    def __query_cal_point(self, point, value): 
+        return self.__query(f'Cal,{point},{value}', self.capabilities.reading.reading_latency)
+
     def __invalidate_output_measurements_cache(self):
         self.current_output_measurements = None # flag for lazy update
 
@@ -180,6 +191,12 @@ class AtlasScientificDevice(object):
         output_units = self.get_enabled_output_measurements()
         result = self.__query(f'rt,{temperature}', self.capabilities.reading.reading_latency)
         return AtlasScientificDeviceSample.from_expected_device_output(result, output_units)
+
+    def __query_cal(self, value): 
+        return self.__query(f'Cal,{value}', self.capabilities.reading.reading_latency)
+
+    def __query_cal_point(self, point, value): 
+        return self.__query(f'Cal,{point},{value}', self.capabilities.reading.reading_latency)
 
     def __query(self, query, process_delay):
         query_bytes = query.encode('ascii') + b'\00'

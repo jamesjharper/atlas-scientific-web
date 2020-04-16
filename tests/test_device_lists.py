@@ -72,7 +72,7 @@ class DevicesTests(unittest.TestCase):
         # expect device info to be read from bus
         i2cbus.read.assert_called_once_with(device_address)
 
-        # expect a empty json list 
+        # expect a json list with a single device
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"address": 98, "device_type": "ORP", "vendor": "atlas-scientific", "version": "1.97"}]', response.data)
  
@@ -116,7 +116,7 @@ class DevicesTests(unittest.TestCase):
         # expect device info to be read from bus
         i2cbus.read.assert_called_once_with(device_address)
 
-        # expect a empty json list 
+        # expect a json list with a single device
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"address": 99, "device_type": "pH", "vendor": "atlas-scientific", "version": "1.98"}]', response.data)
  

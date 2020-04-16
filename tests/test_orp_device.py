@@ -90,6 +90,48 @@ class OrpDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"is_enable": true, "symbol": "mV", "unit": "millivolt", "value_type": "float"}]', response.data)
 
+
+
+    @patch('time.sleep', return_value=None)
+    def test_can_calibrate_low_point_in_atlas_scientific_ph_device(self, patched_time_sleep):
+
+        # Arrange
+        device_address = 99
+
+        i2cbus.read.side_effect = [
+            b'\x01?i,pH,1.98\00', # first call should be for the device info             
+            b'\x01\00',            # call should be to read the result from setting the calibration point
+        ]
+
+        request_body = {
+            'actual_value': 225
+        }
+
+        response = self.app.put('/api/device/99/sample/calibration', json=request_body, follow_redirects=True)
+
+        # Assert
+        i2cbus.write.assert_has_calls([
+                call(device_address, b'i\00'),   # expect 'i' for read info
+                call(device_address, b'Cal,225\00'), # expect 'Cal,225' for setting the calibration point
+            ], 
+            any_order=False)
+
+        # expect to wait for result to be ready
+        patched_time_sleep.assert_has_calls([
+                call(0.3), # "i"
+                call(0.9), # "Cal,225"
+            ], 
+            any_order=False)
+
+        # expect device info to be read from bus
+        i2cbus.read.assert_has_calls([
+                call(device_address), 
+                call(device_address)
+            ], 
+            any_order=False)
+
+        self.assertEqual(response.status_code, 200)
+        
 # TODO: add test to ignore any compensation params given
 
 # TODO add test to fail when attempting to read with temp comp, as this is not supported for this device
