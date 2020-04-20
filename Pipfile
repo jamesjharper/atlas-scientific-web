@@ -5,9 +5,11 @@ name = "pypi"
 
 [packages]
 flask = "==1.1.2"
+flask-restx = "==0.2.0"
 
 [scripts]
 unittests = "python -m unittest discover"
+rund = "python run.py"
 
 [requires]
 python_version = "3.7"

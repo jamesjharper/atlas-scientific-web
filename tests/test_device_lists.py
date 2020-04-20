@@ -30,7 +30,7 @@ class DevicesTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[]', response.data)
+        self.assertEqual(b'[]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     def test_can_return_a_connected_atlas_scientific_orp_device(self, patched_time_sleep):
@@ -74,7 +74,7 @@ class DevicesTests(unittest.TestCase):
 
         # expect a json list with a single device
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"address": 98, "device_type": "ORP", "vendor": "atlas-scientific", "version": "1.97"}]', response.data)
+        self.assertEqual(b'[{"address": 98, "device_type": "ORP", "vendor": "atlas-scientific", "firmware_version": "1.97"}]\n', response.data)
  
     @patch('time.sleep', return_value=None)
     def test_can_return_a_connected_atlas_scientific_ph_device(self, patched_time_sleep):
@@ -118,7 +118,7 @@ class DevicesTests(unittest.TestCase):
 
         # expect a json list with a single device
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"address": 99, "device_type": "pH", "vendor": "atlas-scientific", "version": "1.98"}]', response.data)
+        self.assertEqual(b'[{"address": 99, "device_type": "pH", "vendor": "atlas-scientific", "firmware_version": "1.98"}]\n', response.data)
  
 
     @patch('time.sleep', return_value=None)
@@ -170,7 +170,7 @@ class DevicesTests(unittest.TestCase):
 
         # expect a json response with both devices
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"address": 97, "device_type": "D.O.", "vendor": "atlas-scientific", "version": "1.98"}, {"address": 105, "device_type": "CO2", "vendor": "atlas-scientific", "version": "1.00"}]', response.data)
+        self.assertEqual(b'[{"address": 97, "device_type": "D.O.", "vendor": "atlas-scientific", "firmware_version": "1.98"}, {"address": 105, "device_type": "CO2", "vendor": "atlas-scientific", "firmware_version": "1.00"}]\n', response.data)
  
 if __name__ == '__main__':
     unittest.main()

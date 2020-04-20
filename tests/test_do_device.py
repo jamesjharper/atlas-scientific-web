@@ -56,7 +56,7 @@ class DoDeviceTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": 238.15, "value_type": "float"}, {"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": 419.6, "value_type": "float"}]', response.data)
+        self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float"}, {"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -100,7 +100,7 @@ class DoDeviceTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": 419.6, "value_type": "float"}]', response.data)
+        self.assertEqual(b'[{"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -144,7 +144,7 @@ class DoDeviceTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": 238.15, "value_type": "float"}]', response.data)
+        self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     def test_can_enable_mg_unit_on_atlas_scientific_do_device(self, patched_time_sleep):
@@ -309,7 +309,6 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(enable_response.status_code, 200)
         self.assertEqual(read_response.status_code, 200)
 
-
     @patch('time.sleep', return_value=None)
     def test_can_resolve_supported_outputs_atlas_scientific_do_device(self, patched_time_sleep):
 
@@ -339,7 +338,7 @@ class DoDeviceTests(unittest.TestCase):
 
         # expect a empty json list
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"is_enable": true, "symbol": "%", "unit": "Percent saturation", "value_type": "float"}, {"is_enable": false, "symbol": "mg/L", "unit": "milligram per litre", "value_type": "float"}]', response.data)
+        self.assertEqual(b'[{"is_enable": true, "symbol": "%", "unit": "Percent saturation", "value_type": "float"}, {"is_enable": false, "symbol": "mg/L", "unit": "milligram per litre", "value_type": "float"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     def test_can_compensate_for_kpa_Pressure_in_atlas_scientific_do_device(self, patched_time_sleep):
@@ -356,7 +355,7 @@ class DoDeviceTests(unittest.TestCase):
         request_body = [{
             'factor': 'pressure',
             'symbol': 'kPa', 
-            'value': 90.25
+            'value': '90.25'
         }]
 
         response = self.app.post('/api/device/97/sample/compensation', json=request_body, follow_redirects=True)
@@ -400,7 +399,7 @@ class DoDeviceTests(unittest.TestCase):
         request_body = [{
             'factor': 'temperature',
             'symbol': '°C', 
-            'value': 19.5
+            'value': '19.5'
         }]
 
         response = self.app.post('/api/device/97/sample/compensation', json=request_body, follow_redirects=True)
@@ -444,7 +443,7 @@ class DoDeviceTests(unittest.TestCase):
         request_body = [{
             'factor': 'salinity',
             'symbol': 'μS', 
-            'value': 50000
+            'value': '50000'
         }]
 
         response = self.app.post('/api/device/97/sample/compensation', json=request_body, follow_redirects=True)

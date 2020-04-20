@@ -53,7 +53,7 @@ class OrpDeviceTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "mV", "timestamp": "2020-02-25 23:08:13+00:00", "value": 209.6, "value_type": "float"}]', response.data)
+        self.assertEqual(b'[{"symbol": "mV", "timestamp": "2020-02-25 23:08:13+00:00", "value": "209.6", "value_type": "float"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     def test_can_resolve_supported_outputs_atlas_scientific_orp_device(self, patched_time_sleep):
@@ -88,7 +88,7 @@ class OrpDeviceTests(unittest.TestCase):
 
         # expect a empty json list
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"is_enable": true, "symbol": "mV", "unit": "millivolt", "value_type": "float"}]', response.data)
+        self.assertEqual(b'[{"is_enable": true, "symbol": "mV", "unit": "millivolt", "value_type": "float"}]\n', response.data)
 
 
 
@@ -104,7 +104,7 @@ class OrpDeviceTests(unittest.TestCase):
         ]
 
         request_body = {
-            'actual_value': 225
+            'actual_value': '225'
         }
 
         response = self.app.put('/api/device/99/sample/calibration', json=request_body, follow_redirects=True)
@@ -131,7 +131,7 @@ class OrpDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        
+
 # TODO: add test to ignore any compensation params given
 
 # TODO add test to fail when attempting to read with temp comp, as this is not supported for this device
