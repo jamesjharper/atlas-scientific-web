@@ -4,15 +4,17 @@ from unittest.mock import Mock, call, patch
 from atlas_scientific.device import AtlasScientificDeviceBus
 from datetime import datetime, timezone
 import api
-from api import i2cbus
+from i2c import I2CBus
 
 class DoDeviceTests(unittest.TestCase):
  
     def setUp(self):
-        self.app = api.create_app().test_client()
-        i2cbus.read = Mock()
-        i2cbus.write = Mock()
-        i2cbus.ping = Mock()
+        self.i2cbus = I2CBus()
+        self.i2cbus.read = Mock()
+        self.i2cbus.write = Mock()
+        self.i2cbus.ping = Mock() 
+        
+        self.app = api.create_app(self.i2cbus).test_client()
  
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -21,7 +23,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # first call should be for the device info
                 b'\x01?O,MG,%\00',      # second call should be to read the current device outputs
                 b'\x01238.15,419.6\00'  # second call should be for reading the device sample
@@ -31,7 +33,7 @@ class DoDeviceTests(unittest.TestCase):
         response = self.app.get('/api/device/97/sample', follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),   # expect 'i' for read info
                 call(device_address, b'o,?\00'), # expect 'o,?' for reading current device output
                 call(device_address, b'r\00')    # expect 'r' for read device sample
@@ -47,7 +49,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address), 
                 call(device_address)  
@@ -65,7 +67,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # first call should be for the device info
                 b'\x01?O,%\00',      # second call should be to read the current device outputs
                 b'\x01419.6\00'  # second call should be for reading the device sample
@@ -75,7 +77,7 @@ class DoDeviceTests(unittest.TestCase):
         response = self.app.get('/api/device/97/sample', follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),   # expect 'i' for read info
                 call(device_address, b'o,?\00'), # expect 'o,?' for reading current device output
                 call(device_address, b'r\00')    # expect 'r' for read device sample
@@ -91,7 +93,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address), 
                 call(device_address)  
@@ -109,7 +111,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # first call should be for the device info
                 b'\x01?O,MG\00',      # second call should be to read the current device outputs
                 b'\x01238.15\00'  # second call should be for reading the device sample
@@ -119,7 +121,7 @@ class DoDeviceTests(unittest.TestCase):
         response = self.app.get('/api/device/97/sample', follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),   # expect 'i' for read info
                 call(device_address, b'o,?\00'), # expect 'o,?' for reading current device output
                 call(device_address, b'r\00')    # expect 'r' for read device sample
@@ -135,7 +137,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address), 
                 call(device_address)  
@@ -152,7 +154,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # call should be for the device info
                 b'\x01?O,%\00',         # call should be to read the current device outputs
                 b'\x01\00',             # call should be to read the result from adding mg to device output
@@ -170,7 +172,7 @@ class DoDeviceTests(unittest.TestCase):
         read_response = self.app.get('/api/device/97/sample', follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),      # expect 'i' for read info
                 call(device_address, b'o,?\00'),    # expect 'o,?' for reading current device output
                 call(device_address, b'o,MG,1\00'), # expect 'o,mg,1 to enable mg
@@ -192,7 +194,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address), 
                 call(device_address),
@@ -210,7 +212,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # call should be for the device info
                 b'\x01?O,%\00',         # call should be to read the current device outputs
                 b'\x01\00',             # call should be to read the result from adding mg to device output
@@ -226,7 +228,7 @@ class DoDeviceTests(unittest.TestCase):
         enable_mg_response = self.app.post('/api/device/97/sample/output', json=request_body, follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),          # expect 'i' for read info
                 call(device_address, b'o,?\00'),        # expect 'o,?' for reading current device output
                 call(device_address, b'o,MG,1\00'),     # expect 'o,mg,1
@@ -244,7 +246,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
         
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address), 
                 call(device_address), 
@@ -260,7 +262,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # call should be for the device info
                 b'\x01?O,%\00',         # call should be to read the current device outputs
                 b'\x01\00',             # call should be to read the result from adding mg to device output
@@ -277,7 +279,7 @@ class DoDeviceTests(unittest.TestCase):
         read_response = self.app.get('/api/device/97/sample', follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),      # expect 'i' for read info
                 call(device_address, b'o,?\00'),    # expect 'o,?' for reading current device output
                 call(device_address, b'o,MG,1\00'), # expect 'o,mg,1 to enable mg
@@ -297,7 +299,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address), 
                 call(device_address),
@@ -315,7 +317,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [
+        self.i2cbus.read.side_effect = [
                 b'\x01?I,D.O.,1.98\00', # call should be for the device info
                 b'\x01?O,%\00',         # call should be to read the current device outputs
             ]
@@ -331,7 +333,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
             ], 
             any_order=False)
@@ -346,7 +348,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # first call should be for the device info
                 b'\x01\00',             # call should be to read the result from setting the μS compensation
             ]
@@ -361,7 +363,7 @@ class DoDeviceTests(unittest.TestCase):
         response = self.app.post('/api/device/97/sample/compensation', json=request_body, follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),      # expect 'i' for read info
                 call(device_address, b'P,90.25\00'), # expect 'P,90.25' for setting the μS compensation
             ], 
@@ -375,7 +377,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address)
             ], 
@@ -390,7 +392,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # first call should be for the device info
                 b'\x01\00',             # call should be to read the result from setting the μS compensation
             ]
@@ -405,7 +407,7 @@ class DoDeviceTests(unittest.TestCase):
         response = self.app.post('/api/device/97/sample/compensation', json=request_body, follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),   # expect 'i' for read info
                 call(device_address, b'T,19.5\00'), # expect 'T,19.5' for setting the temperature compensation
             ], 
@@ -419,7 +421,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address)
             ], 
@@ -434,7 +436,7 @@ class DoDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 97
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,D.O.,1.98\00', # first call should be for the device info
                 b'\x01\00',             # call should be to read the result from setting the μS compensation
             ]
@@ -449,7 +451,7 @@ class DoDeviceTests(unittest.TestCase):
         response = self.app.post('/api/device/97/sample/compensation', json=request_body, follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),   # expect 'i' for read info
                 call(device_address, b'S,50000\00'), # expect 'S,50000' for setting the μS compensation
             ], 
@@ -463,7 +465,7 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address)
             ], 

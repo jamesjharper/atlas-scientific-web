@@ -4,16 +4,18 @@ from unittest.mock import Mock, call, patch
 from atlas_scientific.device import AtlasScientificDeviceBus
 from datetime import datetime, timezone
 import api
-from api import i2cbus
 
+from i2c import I2CBus
 
 class OrpDeviceTests(unittest.TestCase):
  
     def setUp(self):
-        self.app = api.create_app().test_client()
-        i2cbus.read = Mock()
-        i2cbus.write = Mock()
-        i2cbus.ping = Mock()
+        self.i2cbus = I2CBus()
+        self.i2cbus.read = Mock()
+        self.i2cbus.write = Mock()
+        self.i2cbus.ping = Mock() 
+        
+        self.app = api.create_app(self.i2cbus).test_client()
  
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -22,7 +24,7 @@ class OrpDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 98
 
-        i2cbus.read.side_effect = [ 
+        self.i2cbus.read.side_effect = [ 
                 b'\x01?I,ORP,1.97\00', # first call should be for the device info
                 b'\x01209.6\00'  # second call should be for reading the device sample
             ]
@@ -31,7 +33,7 @@ class OrpDeviceTests(unittest.TestCase):
         response = self.app.get('/api/device/98/sample', follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'), # expect 'i' for read info
                 call(device_address, b'r\00')  # expect 'r' for read device sample
             ], 
@@ -45,7 +47,7 @@ class OrpDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address)  
             ], 
@@ -61,7 +63,7 @@ class OrpDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 98
 
-        i2cbus.read.side_effect = [
+        self.i2cbus.read.side_effect = [
                 b'\x01?I,ORP,1.97\00', # first call should be for the device info
             ]
 
@@ -69,7 +71,7 @@ class OrpDeviceTests(unittest.TestCase):
         response = self.app.get('/api/device/98/sample/output', follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'), # expect 'i' for read info
             ], 
             any_order=False)
@@ -81,7 +83,7 @@ class OrpDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
             ], 
             any_order=False)
@@ -98,7 +100,7 @@ class OrpDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 99
 
-        i2cbus.read.side_effect = [
+        self.i2cbus.read.side_effect = [
             b'\x01?i,pH,1.98\00', # first call should be for the device info             
             b'\x01\00',            # call should be to read the result from setting the calibration point
         ]
@@ -110,7 +112,7 @@ class OrpDeviceTests(unittest.TestCase):
         response = self.app.put('/api/device/99/sample/calibration', json=request_body, follow_redirects=True)
 
         # Assert
-        i2cbus.write.assert_has_calls([
+        self.i2cbus.write.assert_has_calls([
                 call(device_address, b'i\00'),   # expect 'i' for read info
                 call(device_address, b'Cal,225\00'), # expect 'Cal,225' for setting the calibration point
             ], 
@@ -124,7 +126,7 @@ class OrpDeviceTests(unittest.TestCase):
             any_order=False)
 
         # expect device info to be read from bus
-        i2cbus.read.assert_has_calls([
+        self.i2cbus.read.assert_has_calls([
                 call(device_address), 
                 call(device_address)
             ], 
