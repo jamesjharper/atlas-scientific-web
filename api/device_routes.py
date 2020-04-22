@@ -7,7 +7,7 @@ from flask_restx import Api, Resource, fields
 
 from flask import jsonify, json, request
 
-from atlas_scientific.models import RequestResult, AtlasScientificResponse, AtlasScientificDeviceCompensationFactor, AtlasScientificDeviceCalibrationPoint
+from atlas_scientific.models import *
 from atlas_scientific.device import AtlasScientificDevice, AtlasScientificDeviceBus
 
 def add_device_routes(self, i2cbus):
@@ -16,6 +16,17 @@ def add_device_routes(self, i2cbus):
     api_log = logging.getLogger(f'API')
 
     device_ns = self.namespace('api/device', description='I2C Device operations')
+
+    device_error_model = self.model('device_error', {
+        'message': fields.String(
+            description='A description of the error encountered',
+            example='This is your error message'
+        ),
+        'error_code': fields.String(
+            description='The error code of the error encountered',
+            example='DEVICE_NOT_READY'
+        ),
+    })
 
     device_info_model = self.model('device_info', {
         'address': fields.Integer(
@@ -114,7 +125,39 @@ def add_device_routes(self, i2cbus):
    # TODO: add test for injection
    # TODO: add application token like auth?
 
+    @device_ns.errorhandler(AtlasScientificDeviceNotReadyError)
+    @device_ns.marshal_with(device_error_model, code=400)
+    def handle_atlas_scientific_device_not_ready_error(error):
+        return {
+            'error_code': 'DEVICE_NOT_READY', 
+            'message': 'Device did not return the expected response in a timely mannor.'
+        }, 400
    
+
+    @device_ns.errorhandler(AtlasScientificSyntaxError)
+    @device_ns.marshal_with(device_error_model, code=400)
+    def handle_atlas_scientific_syntax_error(error):
+        return {
+            'error_code': 'COMMAND_ERROR', 
+            'message': 'Device has rejected your request, please confrim the request is supported by the device and the device has the latest firmware.'
+        }, 400
+
+    @device_ns.errorhandler(AtlasScientificError)
+    @device_ns.marshal_with(device_error_model, code=500)
+    def handle_atlas_scientific_errors(error):
+        return {
+            'error_code': 'UNKNOWN', 
+            'message': 'Unexpected error was encountered'
+        }, 500
+
+    @device_ns.errorhandler(Exception)
+    @device_ns.marshal_with(device_error_model, code=500)
+    def handle_atlas_scientific_errors(error):
+        return {
+            'error_code': 'UNEXPECTED_ERROR', 
+            'message': 'Unexpected internal error occurred.'
+        }, 500
+
     @device_ns.route('/')
     class DeviceList(Resource):
 
@@ -141,15 +184,15 @@ def add_device_routes(self, i2cbus):
 
         @device_ns.marshal_list_with(device_sample_model)
         def get(self, address):
-            device = device_bus.get_device_by_address(address)
-            return device.read_sample([])
+            device = device_bus.get_device_by_address(int(address))
+            return device.read_sample([]), 200
 
         @device_ns.marshal_list_with(device_sample_model)
         @device_ns.expect(device_sample_compensation)
         def post(self, address):
             device = device_bus.get_device_by_address(int(address))
             compensation_factors = (AtlasScientificDeviceCompensationFactor(json_list_item) for json_list_item in request.json)  
-            return device.read_sample(compensation_factors)
+            return device.read_sample(compensation_factors), 200
     
 
     @device_ns.route('/<int:address>/sample/output')

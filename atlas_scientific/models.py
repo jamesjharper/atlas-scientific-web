@@ -2,6 +2,15 @@
 
 from enum import Enum
 
+class AtlasScientificError(Exception):
+    pass
+
+class AtlasScientificDeviceNotReadyError(AtlasScientificError):
+    pass
+
+class AtlasScientificSyntaxError(AtlasScientificError):
+    pass
+
 class RequestResult(Enum):
     OK = 1
     SYNTAX_ERROR = 2

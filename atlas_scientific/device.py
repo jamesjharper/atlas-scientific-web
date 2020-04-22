@@ -5,7 +5,7 @@ import sys
 
 from datetime import datetime, timezone
 from i2c import I2CBus
-from .models import RequestResult, AtlasScientificResponse, AtlasScientificDeviceInfo, AtlasScientificDeviceSample, AtlasScientificDeviceOutput
+from .models import *
 from .capabilities import get_device_capabilities
 import sys
 
@@ -130,7 +130,7 @@ class AtlasScientificDevice(object):
 
         for cf in compensation_factors:
             # Currently the only documented compensation factors
-            # which can be rolled in to the read command
+            # which can be rolled into the read command
             if cf.factor.lower() == "temperature":
                 temperature_cf = cf
             else:
@@ -201,15 +201,33 @@ class AtlasScientificDevice(object):
     def __query(self, query, process_delay):
         query_bytes = query.encode('ascii') + b'\00'
         self.device_log.debug(f' TX   >> {query_bytes}')
-
         self.i2cbus.write(self.address, query_bytes)
+
+        # back off by 1/3 when data not ready
+        wait_durations = [
+            process_delay, 
+            process_delay / 3, 
+            process_delay / 3,
+            process_delay / 3,
+        ]
+
+        for wait_duration in wait_durations:
+            response = self.__wait_and_read(wait_duration)
+            if response.status != RequestResult.NOT_READY:
+                return response
+
+        raise AtlasScientificDeviceNotReadyError
+
+    def __wait_and_read(self, process_delay):
         self.device_log.debug(f' WAIT :: {process_delay}')
         time.sleep(process_delay)
         data = self.i2cbus.read(self.address)
         self.device_log.debug(f' RX   << {data}')
 
-        # TODO: add re attempt if NOT_READY returned
-        return AtlasScientificResponse(data, get_datetime_now(timezone.utc))
+        response =  AtlasScientificResponse(data, get_datetime_now(timezone.utc))
+        if response.status == RequestResult.SYNTAX_ERROR:
+            raise AtlasScientificSyntaxError
+        return response
 
 # code stem needed to unit test date times
 def get_datetime_now(tz):
