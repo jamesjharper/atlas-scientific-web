@@ -24,7 +24,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # first call should be for the device info
+                b'\x01?I,DO,1.98\00', # first call should be for the device info
                 b'\x01?O,MG,%\00',      # second call should be to read the current device outputs
                 b'\x01238.15,419.6\00'  # second call should be for reading the device sample
             ]
@@ -68,7 +68,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # first call should be for the device info
+                b'\x01?I,DO,1.98\00', # first call should be for the device info
                 b'\x01?O,%\00',      # second call should be to read the current device outputs
                 b'\x01419.6\00'  # second call should be for reading the device sample
             ]
@@ -112,7 +112,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # first call should be for the device info
+                b'\x01?I,DO,1.98\00', # first call should be for the device info
                 b'\x01?O,MG\00',      # second call should be to read the current device outputs
                 b'\x01238.15\00'  # second call should be for reading the device sample
             ]
@@ -155,7 +155,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # call should be for the device info
+                b'\x01?I,DO,1.98\00', # call should be for the device info
                 b'\x01?O,%\00',         # call should be to read the current device outputs
                 b'\x01\00',             # call should be to read the result from adding mg to device output
                 b'\x01\00',             # call should be to read the result from removing % device output
@@ -213,7 +213,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # call should be for the device info
+                b'\x01?I,DO,1.98\00', # call should be for the device info
                 b'\x01?O,%\00',         # call should be to read the current device outputs
                 b'\x01\00',             # call should be to read the result from adding mg to device output
                 b'\x01\00',             # call should be to read the result from removing % device output
@@ -263,7 +263,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # call should be for the device info
+                b'\x01?I,DO,1.98\00', # call should be for the device info
                 b'\x01?O,%\00',         # call should be to read the current device outputs
                 b'\x01\00',             # call should be to read the result from adding mg to device output
                 b'\x01?O,MG,%\00',      # call should be to RE-read the current device outputs
@@ -318,7 +318,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [
-                b'\x01?I,D.O.,1.98\00', # call should be for the device info
+                b'\x01?I,DO,1.98\00', # call should be for the device info
                 b'\x01?O,%\00',         # call should be to read the current device outputs
             ]
 
@@ -349,7 +349,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # first call should be for the device info
+                b'\x01?I,DO,1.98\00', # first call should be for the device info
                 b'\x01\00',             # call should be to read the result from setting the μS compensation
             ]
 
@@ -393,7 +393,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # first call should be for the device info
+                b'\x01?I,DO,1.98\00', # first call should be for the device info
                 b'\x01\00',             # call should be to read the result from setting the μS compensation
             ]
 
@@ -437,7 +437,7 @@ class DoDeviceTests(unittest.TestCase):
         device_address = 97
 
         self.i2cbus.read.side_effect = [ 
-                b'\x01?I,D.O.,1.98\00', # first call should be for the device info
+                b'\x01?I,DO,1.98\00', # first call should be for the device info
                 b'\x01\00',             # call should be to read the result from setting the μS compensation
             ]
 

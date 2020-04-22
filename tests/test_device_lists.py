@@ -142,7 +142,7 @@ class DevicesTests(unittest.TestCase):
 
         def i2cbus_read(address):
             if address == device1_address:
-                return b'\x01?i,D.O.,1.98\00'
+                return b'\x01?i,DO,1.98\00'
             elif address == device2_address:
                 return b'\x01?i,CO2,1.00\00'
             else:   
@@ -172,7 +172,7 @@ class DevicesTests(unittest.TestCase):
 
         # expect a json response with both devices
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"address": 97, "device_type": "D.O.", "vendor": "atlas-scientific", "firmware_version": "1.98"}, {"address": 105, "device_type": "CO2", "vendor": "atlas-scientific", "firmware_version": "1.00"}]\n', response.data)
+        self.assertEqual(b'[{"address": 97, "device_type": "DO", "vendor": "atlas-scientific", "firmware_version": "1.98"}, {"address": 105, "device_type": "CO2", "vendor": "atlas-scientific", "firmware_version": "1.00"}]\n', response.data)
  
 if __name__ == '__main__':
     unittest.main()

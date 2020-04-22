@@ -35,7 +35,7 @@ def add_device_routes(self, i2cbus):
         ),
         'device_type': fields.String(
             description='The model of the device detected',
-            example='D.O.'
+            example='DO'
         ),
         'vendor': fields.String(
             description='The manifactor of the device',

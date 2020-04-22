@@ -33,7 +33,7 @@ device_capabilities = {
             ],
         },
     },
-    "D.O.": {
+    "DO": {
         "reading": {
             "reading_latency":  0.9,
             "output": [
