@@ -176,7 +176,6 @@ def add_device_routes(self, i2cbus):
                 })
             
             return i2c_devices
-            
 
     @device_ns.route('/<int:address>/sample')
     @device_ns.doc(params={'address': 'An I2C Address of a device'})
@@ -184,13 +183,13 @@ def add_device_routes(self, i2cbus):
 
         @device_ns.marshal_list_with(device_sample_model)
         def get(self, address):
-            device = device_bus.get_device_by_address(int(address))
+            device = device_bus.get_device_by_address(address)
             return device.read_sample([]), 200
 
         @device_ns.marshal_list_with(device_sample_model)
         @device_ns.expect(device_sample_compensation)
         def post(self, address):
-            device = device_bus.get_device_by_address(int(address))
+            device = device_bus.get_device_by_address(address)
             compensation_factors = (AtlasScientificDeviceCompensationFactor(json_list_item) for json_list_item in request.json)  
             return device.read_sample(compensation_factors), 200
     

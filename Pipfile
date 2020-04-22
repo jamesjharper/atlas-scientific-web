@@ -9,7 +9,8 @@ flask-restx = "==0.2.0"
 
 [scripts]
 unittests = "python -m unittest discover"
-rund = "python run.py"
+run-local = "python run_local.py"
+run-hosted = "python run_hosted.py"
 
 [requires]
 python_version = "3.7"
