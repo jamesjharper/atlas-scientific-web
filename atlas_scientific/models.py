@@ -24,10 +24,19 @@ class AtlasScientificResponse(object):
 
         if self.status == RequestResult.OK:
             # omit first byte, as it's the status bytes,
-            # omit last byte as its a terminating null zero
-            self.attributes = response_bytes[1:-1].decode('ascii').split(",")
+            # find the response length to strip the unused data
+            length = AtlasScientificResponse.find_response_length(response_bytes)
+            self.attributes = response_bytes[1:length].decode('ascii').split(",")
         else:
             self.attributes = []
+
+    @staticmethod
+    def find_response_length(response_bytes):
+        # omit content after the first x00, as the device
+        # may return more bytes then expected.
+        l = response_bytes.find(b'\x00')
+        # if no x00 was found, assume all bytes contain data    
+        return l if l != -1 else None
 
 class AtlasScientificDeviceOutput(object): 
     def __init__(self, device_response):

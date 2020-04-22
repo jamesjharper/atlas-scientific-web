@@ -14,7 +14,7 @@ if platform == "win32" or platform == "win64":
         def ping(self, address):
             return False
 
-        def read(self, address, num_of_bytes=31):
+        def read(self, address, num_of_bytes=40):
             return '' 
 
         def write(self, address, value):
