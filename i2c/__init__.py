@@ -4,6 +4,8 @@ default_bus = 1 # the default bus for I2C on the newer Raspberry Pis, certain ol
 
 from sys import platform
 
+read_chuck_size = 128
+
 # TODO: implement this for windows if needed, otherwise this is just for running unit tests
 if platform == "win32" or platform == "win64":
     class I2CBus:
@@ -14,7 +16,8 @@ if platform == "win32" or platform == "win64":
         def ping(self, address):
             return False
 
-        def read(self, address, num_of_bytes=40):
+
+        def read(self, address, num_of_bytes=read_chuck_size):
             return '' 
 
         def write(self, address, value):
@@ -40,7 +43,8 @@ else:
             except IOError:
                 return False
 
-        def read(self, address, num_of_bytes=31):
+
+        def read(self, address, num_of_bytes=read_chuck_size):
             fcntl.ioctl(self.file_read, I2C_SLAVE, address)
             return self.file_read.read(num_of_bytes)  
 
