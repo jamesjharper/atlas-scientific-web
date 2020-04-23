@@ -11,6 +11,9 @@ class AtlasScientificDeviceNotReadyError(AtlasScientificError):
 class AtlasScientificSyntaxError(AtlasScientificError):
     pass
 
+class AtlasScientificNoDeviceAtAddress(AtlasScientificError):
+    pass
+
 class RequestResult(Enum):
     OK = 1
     SYNTAX_ERROR = 2

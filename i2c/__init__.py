@@ -43,7 +43,6 @@ else:
             except IOError:
                 return False
 
-
         def read(self, address, num_of_bytes=read_chuck_size):
             fcntl.ioctl(self.file_read, I2C_SLAVE, address)
             return self.file_read.read(num_of_bytes)  

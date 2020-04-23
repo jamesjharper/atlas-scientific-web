@@ -146,5 +146,41 @@ class PhDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(b'{"message": "Device has rejected your request, please confrim the request is supported by the device and the device has the latest firmware.", "error_code": "COMMAND_ERROR"}\n', response.data)
 
+    @patch('time.sleep', return_value=None)
+    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    def test_should_return_device_not_found_error_if_no_device_exists_at_address(self, datetime_now_mock, patched_time_sleep):
+
+        # Arrange
+        device_address = 110 # nothing at this address
+
+        self.i2cbus.read.side_effect = [
+                b'\x01?i,pH,1.98\00', # first call should be for the device info            
+            ]
+
+        # Act
+        response = self.app.get('/api/device/110/sample', follow_redirects=True)
+
+        # Assert
+        self.i2cbus.write.assert_has_calls([
+                call(device_address, b'i\00'), # expect 'i' for read info
+            ], 
+            any_order=False)
+
+        # expect to wait for result to be ready
+        patched_time_sleep.assert_has_calls([
+                call(0.3), 
+            ], 
+            any_order=False)
+
+        # expect device info to be read from bus
+        self.i2cbus.read.assert_has_calls([
+                call(device_address), 
+            ], 
+            any_order=False)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(b'{"message": "No device is connected to the given address.", "error_code": "DEVICE_NOT_FOUND"}\n', response.data)
+
+
 if __name__ == '__main__':
     unittest.main()
