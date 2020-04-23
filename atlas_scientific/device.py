@@ -24,7 +24,10 @@ class AtlasScientificDeviceBus(object):
         self.forget_known_devices()
 
         for address in range (0,128):
-            self.try_connect_device(address)
+            try:
+                self.__connect_device(address)
+            except Exception:
+                pass
 
     def get_known_devices(self):
         return self.known_devices.values()
@@ -32,15 +35,14 @@ class AtlasScientificDeviceBus(object):
     def get_device_by_address(self, address):
         device = self.known_devices.get(address, None)
         if device is None: 
-            return self.try_connect_device(address)
+            return self.__connect_device(address)
         return device
 
-    def try_connect_device(self, address):      
-        device = AtlasScientificDevice.try_connect(self.i2cbus, address)
-        if device is not None: 
-            device_info = device.get_device_info()
-            logging.debug(f'{device_info.device_type} device found at address {device_info.address}')
-            self.known_devices[address] = device
+    def __connect_device(self, address):      
+        device = AtlasScientificDevice.connect(self.i2cbus, address)
+        device_info = device.get_device_info()
+        logging.debug(f'{device_info.device_type} device found at address {device_info.address}')
+        self.known_devices[address] = device
         return device
 
 class AtlasScientificDevice(object):
@@ -60,18 +62,21 @@ class AtlasScientificDevice(object):
         self.capabilities = get_device_capabilities(self.device_info.device_type)
 
     @staticmethod
-    def try_connect(i2cbus, address):
+    def connect(i2cbus, address):
+        device_log = logging.getLogger(f'I2CDevice[{address}]')  
+
         if not i2cbus.ping(address):
-            return None
+            raise AtlasScientificNoDeviceAtAddress
+
         try:
             # Try read device info,
             # if it fails we assume the device vendor isn't atlas scientific
             return AtlasScientificDevice(i2cbus, address)
+
         except Exception as err:
-            device_log = logging.getLogger(f'I2CDevice[{address}]')  
             device_log.debug(f'failed to connection device, {err}')
             device_log.info('non atlas scientific device found')
-            return None
+            raise err
 
     def get_device_info(self):
         return self.device_info

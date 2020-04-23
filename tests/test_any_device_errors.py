@@ -27,7 +27,7 @@ class PhDeviceTests(unittest.TestCase):
         self.i2cbus.read.side_effect = [
                 b'\x01?i,pH,1.98\00', # first call should be for the device info            
                 b'\xfe\00',            # second call return 'still processing, not ready'
-                b'\x019.560\00'       # third call should succeed and return sample
+                b'\x019.56\00'       # third call should succeed and return sample
             ]
 
         # Act
@@ -153,12 +153,31 @@ class PhDeviceTests(unittest.TestCase):
         # Arrange
         device_address = 110 # nothing at this address
 
-        self.i2cbus.read.side_effect = [
-                b'\x01?i,pH,1.98\00', # first call should be for the device info            
-            ]
+        def i2cbus_ping(address):
+            return address != device_address
+
+        self.i2cbus.ping.side_effect = i2cbus_ping
 
         # Act
         response = self.app.get('/api/device/110/sample', follow_redirects=True)
+
+        # Assert
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(b'{"message": "No device is connected to the given address.", "error_code": "DEVICE_NOT_FOUND"}\n', response.data)
+
+    @patch('time.sleep', return_value=None)
+    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    def test_should_return_device_not_recognized_error_when_response_is_novel(self, datetime_now_mock, patched_time_sleep):
+
+        # Arrange
+        device_address = 99
+
+        self.i2cbus.read.side_effect = [
+                b'Novel response\00', # Unexpected response
+            ]
+
+        # Act
+        response = self.app.get('/api/device/99/sample', follow_redirects=True)
 
         # Assert
         self.i2cbus.write.assert_has_calls([
@@ -179,7 +198,7 @@ class PhDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(b'{"message": "No device is connected to the given address.", "error_code": "DEVICE_NOT_FOUND"}\n', response.data)
+        self.assertEqual(b'{"message": "Device responded but response was not recognizable.", "error_code": "UNEXPECTED_DEVICE_RESPONSE"}\n', response.data)
 
 
 if __name__ == '__main__':

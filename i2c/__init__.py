@@ -14,8 +14,11 @@ if platform == "win32" or platform == "win64":
             pass
 
         def ping(self, address):
-            return False
-
+            try:
+                self.read(address)
+                return True
+            except IOError:
+                return False
 
         def read(self, address, num_of_bytes=read_chuck_size):
             return '' 

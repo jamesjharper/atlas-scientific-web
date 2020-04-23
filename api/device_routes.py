@@ -125,6 +125,14 @@ def add_device_routes(self, i2cbus):
    # TODO: add test for injection
    # TODO: add application token like auth?
 
+    @device_ns.errorhandler(AtlasScientificResponseSyntaxError)
+    @device_ns.marshal_with(device_error_model, code=400)
+    def handle_atlas_scientific_response_syntax_error(error):
+        return {
+            'error_code': 'UNEXPECTED_DEVICE_RESPONSE', 
+            'message': 'Device responded but response was not recognizable.'
+        }, 400
+
     @device_ns.errorhandler(AtlasScientificNoDeviceAtAddress)
     @device_ns.marshal_with(device_error_model, code=400)
     def handle_atlas_scientific_no_device_at_address_error(error):
