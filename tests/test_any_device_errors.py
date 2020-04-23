@@ -173,6 +173,42 @@ class PhDeviceTests(unittest.TestCase):
         device_address = 99
 
         self.i2cbus.read.side_effect = [
+                b'\x01?i,NEW,1.98\00', # first call should be for a new device released by atlas scientific not yet supported
+            ]
+
+        # Act
+        response = self.app.get('/api/device/99/sample', follow_redirects=True)
+
+        # Assert
+        self.i2cbus.write.assert_has_calls([
+                call(device_address, b'i\00'), # expect 'i' for read info
+            ], 
+            any_order=False)
+
+        # expect to wait for result to be ready
+        patched_time_sleep.assert_has_calls([
+                call(0.3), 
+            ], 
+            any_order=False)
+
+        # expect device info to be read from bus
+        self.i2cbus.read.assert_has_calls([
+                call(device_address), 
+            ], 
+            any_order=False)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(b'{"message": "Detected unsupported atlas scientific device.", "error_code": "UNSUPPORTED_DEVICE"}\n', response.data)
+
+
+    @patch('time.sleep', return_value=None)
+    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    def test_should_return_device_not_supported_error_when_response_does_not_match_any_known_device(self, datetime_now_mock, patched_time_sleep):
+
+        # Arrange
+        device_address = 99
+
+        self.i2cbus.read.side_effect = [
                 b'Novel response\00', # Unexpected response
             ]
 
