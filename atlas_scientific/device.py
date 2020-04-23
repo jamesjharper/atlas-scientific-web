@@ -72,9 +72,11 @@ class AtlasScientificDevice(object):
             # Try read device info,
             # if it fails we assume the device vendor isn't atlas scientific
             return AtlasScientificDevice(i2cbus, address)
-
+        except AtlasScientificNotYetSupported as err:
+            device_log.info('Non supported atlas scientific device found.')
+            raise err
         except Exception as err:
-            device_log.debug(f'failed to connection device, {err}')
+            device_log.debug(f'Failed to connection device, {err}')
             device_log.info('non atlas scientific device found')
             raise err
 

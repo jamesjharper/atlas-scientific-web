@@ -14,6 +14,9 @@ class AtlasScientificSyntaxError(AtlasScientificError):
 class AtlasScientificNoDeviceAtAddress(AtlasScientificError):
     pass
 
+class AtlasScientificNotYetSupported(AtlasScientificError):
+    pass
+
 class AtlasScientificResponseSyntaxError(AtlasScientificError):
 
     def __init__(self, felid, message):

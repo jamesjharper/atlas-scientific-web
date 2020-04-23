@@ -1,3 +1,4 @@
+from .models import AtlasScientificNotYetSupported
 
 device_capabilities = {
     "pH": {
@@ -82,7 +83,9 @@ device_capabilities = {
 }
 
 def get_device_capabilities(device_type):
-    caps = device_capabilities.get(device_type, {})
+    caps = device_capabilities.get(device_type, None)
+    if not caps:
+        raise AtlasScientificNotYetSupported
     return DeviceCapabilities(caps)
 
 class DeviceCapabilities(object): 
