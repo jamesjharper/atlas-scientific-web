@@ -236,6 +236,5 @@ class PhDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(b'{"message": "Device responded but response was not recognizable.", "error_code": "UNEXPECTED_DEVICE_RESPONSE"}\n', response.data)
 
-
 if __name__ == '__main__':
     unittest.main()

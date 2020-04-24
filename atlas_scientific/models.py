@@ -23,6 +23,11 @@ class AtlasScientificResponseSyntaxError(AtlasScientificError):
         self.felid = felid
         self.message = message
 
+class ValidationError(Exception):
+    def __init__(self, felid, message):
+        self.felid = felid
+        self.message = message
+
 class RequestResult(Enum):
     OK = 1
     SYNTAX_ERROR = 2
@@ -95,7 +100,6 @@ class AtlasScientificDeviceSample(object):
 
     @staticmethod
     def from_expected_device_output(device_response, expected_output_units):
-
         result = []
         unit_index = 0
         for unit in expected_output_units:
@@ -103,23 +107,14 @@ class AtlasScientificDeviceSample(object):
             result.append(AtlasScientificDeviceSample(unit.symbol, value, unit.value_type, device_response.response_timestamp))
             unit_index = unit_index + 1
         return result
-        
-class AtlasScientificDeviceCompensationFactors(object): 
-    def __init__(self, device_compensation_factors):      
-        factors = (AtlasScientificDeviceCompensationFactor(f) for f in device_compensation_factors)
-        self.factors = {f.factor:f for f in factors}
 
 class AtlasScientificDeviceCompensationFactor(object): 
-    def __init__(self, device_compensation_factor):
-        
-        # TODO: throw error if values are missing
-        self.factor = device_compensation_factor.get('factor', None)
-        self.symbol = device_compensation_factor.get('symbol', None)
-        self.value = device_compensation_factor.get('value', None)
-
+    def __init__(self, factor, symbol, value):
+        self.factor = factor
+        self.symbol = symbol
+        self.value = value
 
 class AtlasScientificDeviceCalibrationPoint(object): 
-    def __init__(self, calibration_point):        
-        # TODO: throw error if values are missing
-        self.point = calibration_point.get('point', None)
-        self.actual_value = calibration_point.get('actual_value', None)
+    def __init__(self, actual_value, point):
+        self.point = point
+        self.actual_value = actual_value

@@ -9,6 +9,7 @@ from flask import jsonify, json, request
 
 from atlas_scientific.models import *
 from atlas_scientific.device import AtlasScientificDevice, AtlasScientificDeviceBus
+from marshmallow import ValidationError, Schema, post_load, fields as m_fields
 
 def add_device_routes(self, i2cbus):
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -95,34 +96,56 @@ def add_device_routes(self, i2cbus):
         ),
     })
 
-    device_sample_compensation = self.model('device_sample_compensation', {
-        'factor': fields.String(
-            description='The measurement factor to compensate for.',
-            example="pressure"
-        ),
-        'symbol': fields.String(
-            description='The symbol of the unit of measurement compensation used by when sampling.',
-            example='kPa'
-        ),
-        'value': fields.String(
-            description='The known value of the measurement compensation. Alway represented as a string.',
-            example='90.25'
-        ), 
-    })
-
     device_sample_calibration = self.model('device_sample_calibration', {
         'point': fields.String(
             description='The calibration point to set',
-            example="mid"
+            example="mid",
+            required=True
         ),
         'actual_value': fields.String(
             description='The known value of the expected measurement. Alway represented as a string.',
-            example='90.25'
+            example='90.25',
+            required=True
         ), 
     })
 
+    class AtlasScientificDeviceCalibrationPointSchema(Schema):
+        #TODO: add tests for missing felids and injection
+        point = m_fields.Str(missing=None, required=False)
+        actual_value = m_fields.Str(required=True)
 
-   # TODO: add test for injection
+        @post_load
+        def make(self, data, **kwargs):
+            return AtlasScientificDeviceCalibrationPoint(**data)
+
+    device_sample_compensation = self.model('device_sample_compensation', {
+        'factor': fields.String(
+            description='The measurement factor to compensate for.',
+            example="pressure",
+            required=True
+        ),
+        'symbol': fields.String(
+            description='The symbol of the unit of measurement compensation used by when sampling.',
+            example='kPa',
+            required=True
+        ),
+        'value': fields.String(
+            description='The known value of the measurement compensation. Alway represented as a string.',
+            example='90.25',
+            required=True
+        ), 
+    })
+
+    class AtlasScientificDeviceCompensationFactorSchema(Schema):
+        #TODO: add tests for missing felids and injection
+        factor = m_fields.Str(required=True)
+        symbol = m_fields.Str()
+        value = m_fields.Str(required=True)
+
+        @post_load
+        def make(self, data, **kwargs):
+            return AtlasScientificDeviceCompensationFactor(**data)
+ 
    # TODO: add application token like auth?
 
     @device_ns.errorhandler(AtlasScientificNotYetSupported)
@@ -169,9 +192,18 @@ def add_device_routes(self, i2cbus):
     @device_ns.marshal_with(device_error_model, code=500)
     def handle_atlas_scientific_errors(error):
         return {
-            'error_code': 'UNKNOWN', 
+            'error_code': 'UNKNOWN_ERROR', 
             'message': 'Unexpected error was encountered'
         }, 500
+
+    @device_ns.errorhandler(ValidationError)
+    @device_ns.marshal_with(device_error_model, code=400)
+    def handle_request_validation_error(error):
+        return {
+            'error_code': 'INVALID_REQUEST_ERROR', 
+            'message': error.messages
+        }, 500
+        
 
     @device_ns.errorhandler(Exception)
     @device_ns.marshal_with(device_error_model, code=500)
@@ -213,7 +245,8 @@ def add_device_routes(self, i2cbus):
         @device_ns.expect(device_sample_compensation)
         def post(self, address):
             device = device_bus.get_device_by_address(address)
-            compensation_factors = (AtlasScientificDeviceCompensationFactor(json_list_item) for json_list_item in request.json)  
+            request_schema = AtlasScientificDeviceCompensationFactorSchema(many=True)
+            compensation_factors = request_schema.load(request.json)
             return device.read_sample(compensation_factors), 200
     
 
@@ -249,7 +282,8 @@ def add_device_routes(self, i2cbus):
         def post(self, address):
             device = device_bus.get_device_by_address(address)
 
-            compensation_factors = (AtlasScientificDeviceCompensationFactor(json_list_item) for json_list_item in request.json)   
+            request_schema = AtlasScientificDeviceCompensationFactorSchema(many=True)
+            compensation_factors = request_schema.load(request.json)
             device.set_measurement_compensation_factors(compensation_factors)
 
             return '', 200
@@ -261,7 +295,8 @@ def add_device_routes(self, i2cbus):
         def put(self, address):
             device = device_bus.get_device_by_address(address)
 
-            calibration_point = AtlasScientificDeviceCalibrationPoint(request.json)   
+            request_schema = AtlasScientificDeviceCalibrationPointSchema()
+            calibration_point = request_schema.load(request.json)   
             device.set_calibration_point(calibration_point)
 
             return '', 200
