@@ -1,13 +1,11 @@
 import unittest
-from unittest.mock import Mock, call, patch
-
-from atlas_scientific.device import AtlasScientificDeviceBus
-from datetime import datetime, timezone
 import api
+from unittest.mock import Mock
 
+from parameterized import parameterized
 from i2c import I2CBus
 
-class AnyDeviceErrorTests(unittest.TestCase):
+class ModelValidationTests(unittest.TestCase):
  
     def setUp(self):
         self.i2cbus = I2CBus()
@@ -17,17 +15,48 @@ class AnyDeviceErrorTests(unittest.TestCase):
         
         self.app = api.create_app(self.i2cbus).test_client()
 
-    def test_should_return_expected_value_missing_error_when_compensation_factor_missing(self):
-        # Arrange
-        request_body = [{
-            #'factor': 'salinity',
-            'symbol': 'μS', 
-            'value': '50000'
-        }]
-
+    @parameterized.expand([
+        [
+            'when_compensation_factor_missing', 
+            'post', '/api/device/97/sample/compensation', 
+            [{
+                #'factor': 'salinity', is missing!
+                'symbol': 'μS', 
+                'value': '50000'
+            }],
+        ],
+        [
+            'when_compensation_symbol_missing',
+            'post', '/api/device/97/sample/compensation',
+            [{
+                'factor': 'salinity', 
+                #'symbol': 'μS', is missing!
+                'value': '50000'
+            }],
+        ],
+        [
+            'when_compensation_value_missing',
+            'post', '/api/device/97/sample/compensation',
+            [{
+                'factor': 'salinity', 
+                'symbol': 'μS', 
+                #'value': '50000' is missing!
+            }],
+        ],
+        [
+            'when_calibration_value_missing',
+            'put', '/api/device/99/sample/calibration',
+            {
+                'point': 'high',
+                #'actual_value': '10.0' is missing!
+            },
+        ],
+    ])
+    def test_should_return_invalid_request_error(self, name, method, url, request_body):
         # Act
-        response = self.app.post('/api/device/97/sample/compensation', json=request_body, follow_redirects=True)
-
+        http_method = getattr(self.app, method)
+        response = http_method(url, json=request_body, follow_redirects=True)
+        
         # Assert
         self.assertEqual(response.status_code, 400)
         self.assertEqual(b'{"message": "Request contains a missing or incorrectly formatted felid.", "error_code": "INVALID_REQUEST_ERROR"}\n', response.data)
