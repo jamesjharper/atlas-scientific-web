@@ -1,4 +1,4 @@
-from .models import AtlasScientificNotYetSupported
+from .models import AtlasScientificDeviceNotYetSupported
 
 device_capabilities = {
     "pH": {
@@ -61,7 +61,7 @@ device_capabilities = {
             },
             {
                 "factor": "Pressure",
-                "symbol": " kPa",
+                "symbol": "kPa",
                 "unit": "kilopascal",
                 "command": "P",
                 "value_type": "float"
@@ -85,7 +85,7 @@ device_capabilities = {
 def get_device_capabilities(device_type):
     caps = device_capabilities.get(device_type, None)
     if not caps:
-        raise AtlasScientificNotYetSupported
+        raise AtlasScientificDeviceNotYetSupported
     return DeviceCapabilities(caps)
 
 class DeviceCapabilities(object): 

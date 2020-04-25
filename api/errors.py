@@ -3,7 +3,7 @@ import logging
 from flask_restx import Namespace, Resource, fields
 from marshmallow import ValidationError, Schema, post_load, fields as m_fields
 from atlas_scientific.models import RequestValidationError, \
-    AtlasScientificNotYetSupported, \
+    AtlasScientificDeviceNotYetSupported, \
     AtlasScientificResponseSyntaxError, \
     AtlasScientificNoDeviceAtAddress, \
     AtlasScientificDeviceNotReadyError, \
@@ -41,7 +41,7 @@ def add_device_errors(self):
             'message': "Request contains a missing or incorrectly formatted felid."
         }, 400
 
-    @self.errorhandler(AtlasScientificNotYetSupported)
+    @self.errorhandler(AtlasScientificDeviceNotYetSupported)
     @self.marshal_with(device_error_model, code=400)
     def handle_atlas_scientific_response_syntax_error(error):
         return {
@@ -92,14 +92,12 @@ def add_device_errors(self):
     @self.errorhandler(Exception)
     @self.marshal_with(device_error_model, code=500)
     def handle_atlas_scientific_errors(error):
-        api_log.error("getting anyied handle_atlas_scientific_errors")
         return {
             'error_code': 'UNEXPECTED_ERROR', 
             'message': 'Unexpected internal error occurred.'
         }, 500
 
     def default_error_handler(error):
-        api_log.error("getting anyied default_error_handler")
         return {
             'error_code': 'UNEXPECTED_ERROR', 
             'message': 'Unexpected internal error occurred.'

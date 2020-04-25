@@ -200,7 +200,6 @@ class AnyDeviceErrorTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(b'{"message": "Detected unsupported atlas scientific device.", "error_code": "UNSUPPORTED_DEVICE"}\n', response.data)
 
-
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_should_return_device_not_supported_error_when_response_does_not_match_any_known_device(self, datetime_now_mock, patched_time_sleep):
@@ -235,22 +234,6 @@ class AnyDeviceErrorTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(b'{"message": "Device responded but response was not recognizable.", "error_code": "UNEXPECTED_DEVICE_RESPONSE"}\n', response.data)
-
-    def test_should_return_expected_value_missing_error_when_compensation_factor_missing(self):
-
-        # Arrange
-        request_body = [{
-            #'factor': 'salinity',
-            'symbol': 'μS', 
-            'value': '50000'
-        }]
-
-        # Act
-        response = self.app.post('/api/device/97/sample/compensation', json=request_body, follow_redirects=True)
-
-        # Assert
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(b'{"message": "Request contains a missing or incorrectly formatted felid.", "error_code": "INVALID_REQUEST_ERROR"}\n', response.data)
 
 if __name__ == '__main__':
     unittest.main()

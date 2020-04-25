@@ -26,6 +26,24 @@ class ModelValidationTests(unittest.TestCase):
             }],
         ],
         [
+            'when_compensation_factor_does_not_exist', 
+            'post', '/api/device/97/sample/compensation', 
+            [{
+                'factor': 'not a real value',
+                'symbol': 'μS', 
+                'value': '50000'
+            }],
+        ],
+        [
+            'when_compensation_factor_unit_does_not_match_expected_units', 
+            'post', '/api/device/97/sample/compensation', 
+            [{
+                'factor': 'salinity',
+                'symbol': 'microcentury', 
+                'value': '50000'
+            }],
+        ],
+        [
             'when_compensation_symbol_missing',
             'post', '/api/device/97/sample/compensation',
             [{
@@ -53,6 +71,11 @@ class ModelValidationTests(unittest.TestCase):
         ],
     ])
     def test_should_return_invalid_request_error(self, name, method, url, request_body):
+
+        self.i2cbus.read.side_effect = [ 
+                b'\x01?I,DO,1.98\00',
+            ]
+
         # Act
         http_method = getattr(self.app, method)
         response = http_method(url, json=request_body, follow_redirects=True)

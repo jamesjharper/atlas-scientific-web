@@ -14,7 +14,7 @@ class AtlasScientificSyntaxError(AtlasScientificError):
 class AtlasScientificNoDeviceAtAddress(AtlasScientificError):
     pass
 
-class AtlasScientificNotYetSupported(AtlasScientificError):
+class AtlasScientificDeviceNotYetSupported(AtlasScientificError):
     pass
 
 class AtlasScientificResponseSyntaxError(AtlasScientificError):

@@ -71,7 +71,7 @@ class AtlasScientificDevice(object):
             # Try read device info,
             # if it fails we assume the device vendor isn't atlas scientific
             return AtlasScientificDevice(i2cbus, address)
-        except AtlasScientificNotYetSupported as err:
+        except AtlasScientificDeviceNotYetSupported as err:
             device_log.info('Non supported atlas scientific device found.')
             raise err
         except Exception as err:
@@ -154,9 +154,15 @@ class AtlasScientificDevice(object):
         factors = self.get_supported_compensation_factors()
 
         for compensation_factor in compensation_factors:
-            # TODO: return error when no match
-            command = factors.get(compensation_factor.factor.lower(), None).command
-            self.__query(f'{command},{compensation_factor.value}', self.device_request_latency)
+            factor = factors.get(compensation_factor.factor.lower(), None)
+            
+            if not factor: 
+                raise RequestValidationError
+
+            if not case_insensitive_eq(factor.symbol, compensation_factor.symbol):
+                raise RequestValidationError
+
+            self.__query(f'{factor.command},{compensation_factor.value}', self.device_request_latency)
 
     def set_calibration_point(self, calibration_point):
         # TODO: needs input validation
@@ -234,6 +240,9 @@ class AtlasScientificDevice(object):
         if response.status == RequestResult.SYNTAX_ERROR:
             raise AtlasScientificSyntaxError
         return response
+    
+def case_insensitive_eq(a, b):
+    return a.lower() == b.lower()
 
 # code stem needed to unit test date times
 def get_datetime_now(tz):
