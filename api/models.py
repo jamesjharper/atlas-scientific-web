@@ -6,9 +6,8 @@ class DeviceModels(object):
     pass
 
 def add_device_models(self):
-
     m = DeviceModels()
-    m.device_info_model = self.model('device_info', {
+    m.device_info = self.model('device_info', {
         'address': fields.Integer(
             description='The I2C address of the device.',
             example='97'
@@ -27,7 +26,7 @@ def add_device_models(self):
         ), 
     })
 
-    m.device_sample_model = self.model('device_sample', {
+    m.device_sample = self.model('device_sample', {
         'symbol': fields.String(
             description='The samples unit of measurement.',
             example='mg/L'
