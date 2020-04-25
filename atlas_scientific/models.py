@@ -23,10 +23,8 @@ class AtlasScientificResponseSyntaxError(AtlasScientificError):
         self.felid = felid
         self.message = message
 
-class ValidationError(Exception):
-    def __init__(self, felid, message):
-        self.felid = felid
-        self.message = message
+class RequestValidationError(Exception):
+    pass
 
 class RequestResult(Enum):
     OK = 1

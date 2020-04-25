@@ -16,7 +16,6 @@ class AtlasScientificDeviceBus(object):
 
     def forget_known_devices(self):
         logging.info('Forgeting known devices.')
-        # clear perviously known devices
         self.known_devices = {}
 
     def scan_for_devices(self):

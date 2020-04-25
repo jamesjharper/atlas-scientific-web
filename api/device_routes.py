@@ -3,12 +3,12 @@ import logging
 import sys
 
 from flask import Flask
-from flask_restx import Api, Resource, fields
-
 from flask import jsonify, json, request
+from flask_restx import Api, Resource, fields
 
 from atlas_scientific.models import *
 from atlas_scientific.device import AtlasScientificDevice, AtlasScientificDeviceBus
+
 from marshmallow import ValidationError, Schema, post_load, fields as m_fields
 
 def add_device_routes(self, i2cbus):
@@ -118,6 +118,8 @@ def add_device_routes(self, i2cbus):
         def make(self, data, **kwargs):
             return AtlasScientificDeviceCalibrationPoint(**data)
 
+    device_calibration_point_schema = AtlasScientificDeviceCalibrationPointSchema()
+
     device_sample_compensation = self.model('device_sample_compensation', {
         'factor': fields.String(
             description='The measurement factor to compensate for.',
@@ -145,8 +147,27 @@ def add_device_routes(self, i2cbus):
         @post_load
         def make(self, data, **kwargs):
             return AtlasScientificDeviceCompensationFactor(**data)
- 
+        
+    device_compensation_factors_schema = AtlasScientificDeviceCompensationFactorSchema(many=True)
+
    # TODO: add application token like auth?
+
+    def load_request(self, request):
+        try:
+            return self.load(request.json)
+        except ValidationError as err:
+            api_log.error(f"Input validation error {err.normalized_messages()}")
+            raise RequestValidationError()
+
+    Schema.load_request = load_request
+
+    @device_ns.errorhandler(RequestValidationError)
+    @device_ns.marshal_with(device_error_model, code=400)
+    def handle_request_validation_error(error):
+        return {
+            'error_code': 'INVALID_REQUEST_ERROR', 
+            'message': "Request contains a missing or incorrectly formatted felid."
+        }, 400
 
     @device_ns.errorhandler(AtlasScientificNotYetSupported)
     @device_ns.marshal_with(device_error_model, code=400)
@@ -196,18 +217,17 @@ def add_device_routes(self, i2cbus):
             'message': 'Unexpected error was encountered'
         }, 500
 
-    @device_ns.errorhandler(ValidationError)
-    @device_ns.marshal_with(device_error_model, code=400)
-    def handle_request_validation_error(error):
-        return {
-            'error_code': 'INVALID_REQUEST_ERROR', 
-            'message': error.messages
-        }, 500
-        
-
     @device_ns.errorhandler(Exception)
     @device_ns.marshal_with(device_error_model, code=500)
     def handle_atlas_scientific_errors(error):
+        api_log.error("getting anyied handle_atlas_scientific_errors")
+        return {
+            'error_code': 'UNEXPECTED_ERROR', 
+            'message': 'Unexpected internal error occurred.'
+        }, 500
+
+    def default_error_handler(error):
+        api_log.error("getting anyied default_error_handler")
         return {
             'error_code': 'UNEXPECTED_ERROR', 
             'message': 'Unexpected internal error occurred.'
@@ -245,10 +265,8 @@ def add_device_routes(self, i2cbus):
         @device_ns.expect(device_sample_compensation)
         def post(self, address):
             device = device_bus.get_device_by_address(address)
-            request_schema = AtlasScientificDeviceCompensationFactorSchema(many=True)
-            compensation_factors = request_schema.load(request.json)
+            compensation_factors = device_compensation_factors_schema.load_request(request)
             return device.read_sample(compensation_factors), 200
-    
 
     @device_ns.route('/<int:address>/sample/output')
     class DeviceSampleOutput(Resource):
@@ -259,7 +277,7 @@ def add_device_routes(self, i2cbus):
             enabled_outputs = set(m.unit_code for m in device.get_enabled_output_measurements())
 
             sample_outputs = []
-            for sample_output in supported_outputs:
+            for sample_output in supported_outputs: 
                 sample_outputs.append({
                     'symbol': sample_output.symbol,
                     'unit': sample_output.unit,
@@ -280,10 +298,8 @@ def add_device_routes(self, i2cbus):
 
         @device_ns.expect(device_sample_compensation)
         def post(self, address):
+            compensation_factors = device_compensation_factors_schema.load_request(request)
             device = device_bus.get_device_by_address(address)
-
-            request_schema = AtlasScientificDeviceCompensationFactorSchema(many=True)
-            compensation_factors = request_schema.load(request.json)
             device.set_measurement_compensation_factors(compensation_factors)
 
             return '', 200
@@ -293,10 +309,8 @@ def add_device_routes(self, i2cbus):
 
         @device_ns.expect(device_sample_calibration)
         def put(self, address):
+            calibration_point = device_calibration_point_schema.load_request(request)
             device = device_bus.get_device_by_address(address)
-
-            request_schema = AtlasScientificDeviceCalibrationPointSchema()
-            calibration_point = request_schema.load(request.json)   
             device.set_calibration_point(calibration_point)
 
             return '', 200
