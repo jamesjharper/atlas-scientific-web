@@ -173,7 +173,7 @@ class AtlasScientificDevice(object):
             if not insensitive_eq(factor.symbol, compensation_factor.symbol):
                 raise RequestValidationError
 
-            # TODO: Add check to make sure value type match
+            factor.value_type.validate_is_of_type(compensation_factor.value)
 
             self.__query(f'{factor.command},{compensation_factor.value}', self.device_request_latency)
 

@@ -101,8 +101,8 @@ class ModelValidationTests(unittest.TestCase):
             'post', '/api/device/97/sample/compensation', 
             [{
                 'factor': 'salinity',
-                'symbol': 'microcentury', 
-                'value': 'not a float!'
+                'symbol': 'μS', 
+                'value': '1.0.0'
             }],
         ],
     ])
