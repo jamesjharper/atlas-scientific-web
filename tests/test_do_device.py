@@ -15,7 +15,9 @@ class DoDeviceTests(unittest.TestCase):
         self.i2cbus.ping = Mock() 
         
         self.app = api.create_app(self.i2cbus).test_client()
- 
+
+    # Sample tests
+
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_do_device_with_all_output_units_enabled(self, datetime_now_mock, patched_time_sleep):
@@ -60,7 +62,49 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float"}, {"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float"}]\n', response.data)
 
-    # TODO: add test for no output enabled
+    @patch('time.sleep', return_value=None)
+    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    def test_can_sample_atlas_scientific_do_device_with_no_output_units_enabled(self, datetime_now_mock, patched_time_sleep):
+
+        # Arrange
+        device_address = 97
+
+        self.i2cbus.read.side_effect = [ 
+                b'\x01?I,DO,1.98\00', # first call should be for the device info
+                b'\x01?O\00',    # second call should be to read the current device outputs
+                b'\x01no output\00'   # third call should be for reading the device sample
+            ]
+
+        # Act
+        response = self.app.get('/api/device/97/sample', follow_redirects=True)
+
+        # Assert
+        self.i2cbus.write.assert_has_calls([
+                call(device_address, b'i\00'),   # expect 'i' for read info
+                call(device_address, b'o,?\00'), # expect 'o,?' for reading current device output
+                call(device_address, b'r\00')    # expect 'r' for read device sample
+            ], 
+            any_order=False)
+
+        # expect to wait for result to be ready
+        patched_time_sleep.assert_has_calls([
+                call(0.3), # "i"
+                call(0.3), # "o,?"
+                call(0.6)  # "r"
+            ], 
+            any_order=False)
+
+        # expect device info to be read from bus
+        self.i2cbus.read.assert_has_calls([
+                call(device_address), 
+                call(device_address), 
+                call(device_address)  
+            ], 
+            any_order=False)
+
+        # expect a empty json list 
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(b'[]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -150,63 +194,65 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float"}]\n', response.data)
 
+    # Sample output tests
+
     @patch('time.sleep', return_value=None)
     def test_can_enable_mg_unit_on_atlas_scientific_do_device(self, patched_time_sleep):
 
-        # Arrange
-        device_address = 97
+            # Arrange
+            device_address = 97
 
-        self.i2cbus.read.side_effect = [ 
-                b'\x01?I,DO,1.98\00', # call should be for the device info
-                b'\x01?O,%\00',         # call should be to read the current device outputs
-                b'\x01\00',             # call should be to read the result from adding mg to device output
-                b'\x01\00',             # call should be to read the result from removing % device output
-                b'\x01?O,MG\00',        # call should be to RE-read the current device outputs
-                b'\x01238.15\00'        # call should be for reading the device sample
-            ]
+            self.i2cbus.read.side_effect = [ 
+                    b'\x01?I,DO,1.98\00', # call should be for the device info
+                    b'\x01?O,%\00',         # call should be to read the current device outputs
+                    b'\x01\00',             # call should be to read the result from adding mg to device output
+                    b'\x01\00',             # call should be to read the result from removing % device output
+                    b'\x01?O,MG\00',        # call should be to RE-read the current device outputs
+                    b'\x01238.15\00'        # call should be for reading the device sample
+                ]
 
-        # body should be a list of all the units to be enabled.
-        # Note, all other units not in this list will be disabled 
-        request_body = ['mg']
+            # body should be a list of all the units to be enabled.
+            # Note, all other units not in this list will be disabled 
+            request_body = ['mg']
 
-        # Act
-        enable_mg_response = self.app.post('/api/device/97/sample/output', json=request_body, follow_redirects=True)
-        read_response = self.app.get('/api/device/97/sample', follow_redirects=True)
+            # Act
+            enable_mg_response = self.app.post('/api/device/97/sample/output', json=request_body, follow_redirects=True)
+            read_response = self.app.get('/api/device/97/sample', follow_redirects=True)
 
-        # Assert
-        self.i2cbus.write.assert_has_calls([
-                call(device_address, b'i\00'),      # expect 'i' for read info
-                call(device_address, b'o,?\00'),    # expect 'o,?' for reading current device output
-                call(device_address, b'o,MG,1\00'), # expect 'o,mg,1 to enable mg
-                call(device_address, b'o,%,0\00'),  # expect 'o,%,0 to disable mg
-                call(device_address, b'o,?\00'),    # expect 'o,?' for Re-reading current device output
-                call(device_address, b'r\00')       # expect 'r' for read device sample
-            ], 
-            any_order=False)
+            # Assert
+            self.i2cbus.write.assert_has_calls([
+                    call(device_address, b'i\00'),      # expect 'i' for read info
+                    call(device_address, b'o,?\00'),    # expect 'o,?' for reading current device output
+                    call(device_address, b'o,MG,1\00'), # expect 'o,mg,1 to enable mg
+                    call(device_address, b'o,%,0\00'),  # expect 'o,%,0 to disable mg
+                    call(device_address, b'o,?\00'),    # expect 'o,?' for Re-reading current device output
+                    call(device_address, b'r\00')       # expect 'r' for read device sample
+                ], 
+                any_order=False)
 
-        # expect to wait for result to be ready
-        patched_time_sleep.assert_has_calls([
-                call(0.3), # "i"
-                call(0.3), # "o,?"
-                call(0.3), # "o,mg,1"
-                call(0.3), # "o,%,0"
-                call(0.3), # "o,?"
-                call(0.6)  # "r"
-            ], 
-            any_order=False)
+            # expect to wait for result to be ready
+            patched_time_sleep.assert_has_calls([
+                    call(0.3), # "i"
+                    call(0.3), # "o,?"
+                    call(0.3), # "o,mg,1"
+                    call(0.3), # "o,%,0"
+                    call(0.3), # "o,?"
+                    call(0.6)  # "r"
+                ], 
+                any_order=False)
 
-        # expect device info to be read from bus
-        self.i2cbus.read.assert_has_calls([
-                call(device_address), 
-                call(device_address), 
-                call(device_address),
-                call(device_address),
-                call(device_address) 
-            ], 
-            any_order=False)
+            # expect device info to be read from bus
+            self.i2cbus.read.assert_has_calls([
+                    call(device_address), 
+                    call(device_address), 
+                    call(device_address),
+                    call(device_address),
+                    call(device_address) 
+                ], 
+                any_order=False)
 
-        self.assertEqual(enable_mg_response.status_code, 200)
-        self.assertEqual(read_response.status_code, 200)
+            self.assertEqual(enable_mg_response.status_code, 200)
+            self.assertEqual(read_response.status_code, 200)
 
     @patch('time.sleep', return_value=None)
     def test_can_enable_mg_case_insensitive_unit_on_atlas_scientific_do_device(self, patched_time_sleep):
@@ -344,6 +390,8 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"is_enable": true, "symbol": "%", "unit": "Percent saturation", "value_type": "float"}, {"is_enable": false, "symbol": "mg/L", "unit": "milligram per litre", "value_type": "float"}]\n', response.data)
 
+    # compensation tests
+
     @patch('time.sleep', return_value=None)
     def test_can_compensate_for_kpa_Pressure_in_atlas_scientific_do_device(self, patched_time_sleep):
 
@@ -476,6 +524,8 @@ class DoDeviceTests(unittest.TestCase):
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
 
+    # Calibration tests
+
     @patch('time.sleep', return_value=None)
     def test_can_calibrate_0_mg_point_in_atlas_scientific_do_device(self, patched_time_sleep):
 
@@ -517,7 +567,7 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     @patch('time.sleep', return_value=None)
-    def test_can_calibrate_0_mg_point_in_atlas_scientific_do_device(self, patched_time_sleep):
+    def test_can_calibrate_atmospheric_point_in_atlas_scientific_do_device(self, patched_time_sleep):
 
         # Arrange
         device_address = 99
@@ -555,6 +605,3 @@ class DoDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-
-# TODO: add test for when attempting to enable unit which is not supported
-#atmospheric

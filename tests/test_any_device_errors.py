@@ -167,7 +167,7 @@ class AnyDeviceErrorTests(unittest.TestCase):
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
-    def test_should_return_device_not_recognized_error_when_response_is_novel(self, datetime_now_mock, patched_time_sleep):
+    def test_should_return_device_not_recognized_error_when_device_response_is_novel(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
         device_address = 99

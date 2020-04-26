@@ -17,6 +17,9 @@ class OrpDeviceTests(unittest.TestCase):
         
         self.app = api.create_app(self.i2cbus).test_client()
  
+
+    # Sample tests
+
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_orp_device(self, datetime_now_mock, patched_time_sleep):
@@ -53,9 +56,10 @@ class OrpDeviceTests(unittest.TestCase):
             ], 
             any_order=False)
 
-        # expect a empty json list 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"symbol": "mV", "timestamp": "2020-02-25 23:08:13+00:00", "value": "209.6", "value_type": "float"}]\n', response.data)
+
+    # Sample output tests
 
     @patch('time.sleep', return_value=None)
     def test_can_resolve_supported_outputs_atlas_scientific_orp_device(self, patched_time_sleep):
@@ -88,9 +92,35 @@ class OrpDeviceTests(unittest.TestCase):
             ], 
             any_order=False)
 
-        # expect a empty json list
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"is_enable": true, "symbol": "mV", "unit": "millivolt", "value_type": "float"}]\n', response.data)
+
+    # compensation tests
+
+    @patch('time.sleep', return_value=None)
+    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    def test_should_return_invalid_request_when_sampling_atlas_scientific_orp_device_with_temperature_compensation(self, datetime_now_mock, patched_time_sleep):
+
+        # Arrange
+        self.i2cbus.read.side_effect = [ 
+                b'\x01?I,ORP,1.97\00', # first call should be for the device info
+            ]
+
+        # Act
+        request_body = [{
+            'factor': 'temperature',
+            'symbol': '°C', 
+            'value': '25.5'
+        }]
+
+        # Act
+        response = self.app.post('/api/device/98/sample', json=request_body, follow_redirects=True)
+
+        # Assert
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(b'{"message": "Request contains a missing or incorrectly formatted felid.", "error_code": "INVALID_REQUEST_ERROR"}\n', response.data)
+
+    # Calibration tests
 
     @patch('time.sleep', return_value=None)
     def test_can_calibrate_any_point_in_atlas_scientific_ph_device(self, patched_time_sleep):
@@ -132,7 +162,3 @@ class OrpDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-
-# TODO: add test to ignore any compensation params given
-
-# TODO add test to fail when attempting to read with temp comp, as this is not supported for this device

@@ -157,22 +157,17 @@ class AtlasScientificDevice(object):
             self.set_measurement_compensation_factors(explicit_cf)
 
         if temperature_cf:
+            factor = self.__get_measurement_compensation_factor(temperature_cf)
+            factor.value_type.validate_is_of_type(temperature_cf.value)
+
             return self.__query_rt(temperature_cf.value)
         else:
             return self.__query_r()
 
     def set_measurement_compensation_factors(self, compensation_factors):
-        factors = self.get_supported_compensation_factors()
 
         for compensation_factor in compensation_factors:
-            factor = factors.get(compensation_factor.factor.lower(), None)
-            
-            if not factor: 
-                raise RequestValidationError
-
-            if not insensitive_eq(factor.symbol, compensation_factor.symbol):
-                raise RequestValidationError
-
+            factor = self.__get_measurement_compensation_factor(compensation_factor)
             factor.value_type.validate_is_of_type(compensation_factor.value)
 
             self.__query(f'{factor.command},{compensation_factor.value}', self.device_request_latency)
@@ -194,6 +189,18 @@ class AtlasScientificDevice(object):
             cal_request = f"{cal_request},{calibration.actual_value}"
 
         return self.__query(cal_request, self.capabilities.calibration.latency)
+
+    def __get_measurement_compensation_factor(self, compensation_factor):
+        factors = self.get_supported_compensation_factors()
+        factor = factors.get(compensation_factor.factor.lower(), None)
+         
+        if not factor: 
+            raise RequestValidationError
+
+        if not insensitive_eq(factor.symbol, compensation_factor.symbol):
+            raise RequestValidationError
+    
+        return factor
 
     def __invalidate_output_measurements_cache(self):
         self.current_output_measurements = None # flag for lazy update

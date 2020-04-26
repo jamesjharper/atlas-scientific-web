@@ -17,6 +17,8 @@ class PhDeviceTests(unittest.TestCase):
         
         self.app = api.create_app(self.i2cbus).test_client()
 
+    # sample tests
+
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_ph_device(self, datetime_now_mock, patched_time_sleep):
@@ -144,6 +146,8 @@ class PhDeviceTests(unittest.TestCase):
         self.assertEqual(response1.status_code, 200)
         self.assertEqual(response2.status_code, 200)
 
+    # Sample output tests
+
     @patch('time.sleep', return_value=None)
     def test_can_resolve_supported_outputs_atlas_scientific_ph_device(self, patched_time_sleep):
 
@@ -177,6 +181,8 @@ class PhDeviceTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"is_enable": true, "symbol": "pH", "unit": "Power of Hydrogen", "value_type": "float"}]\n', response.data)
+
+    # Compensation tests
 
     @patch('time.sleep', return_value=None)
     def test_can_compensate_for_temperature_in_atlas_scientific_ph_device(self, patched_time_sleep):
@@ -220,6 +226,8 @@ class PhDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
+
+    # Calibration tests
 
     @patch('time.sleep', return_value=None)
     def test_can_calibrate_low_point_in_atlas_scientific_ph_device(self, patched_time_sleep):
