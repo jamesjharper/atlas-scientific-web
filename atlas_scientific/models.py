@@ -74,7 +74,7 @@ class AtlasScientificResponse(object):
         # omit content after the first x00, as the device
         # may return more bytes then expected.
         l = response_bytes.find(b'\x00')
-        # if no x00 was found, assume all bytes contain data    
+        # if no x00 was found, assume all bytes contain data
         return l if l != -1 else None
 
 class AtlasScientificDeviceOutput(object): 
@@ -116,3 +116,20 @@ class AtlasScientificDeviceCalibrationPoint(object):
     def __init__(self, actual_value, point):
         self.point = point
         self.actual_value = actual_value
+
+class ExpectedValueType(object):
+    def __init__(self, expected_value_type):
+            self.t = expected_value_type
+
+    def validate_is_of_type(self, value):
+        try:
+            if self.t == "float":
+                return float(value)
+            elif self.t == "int":
+                return int(value)
+            elif self.t == "string":
+                return str(value)
+            elif self.t == "string":
+                return bool(value)
+        except ValueError:
+            raise RequestValidationError

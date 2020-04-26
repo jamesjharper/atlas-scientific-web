@@ -92,20 +92,19 @@ class OrpDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"is_enable": true, "symbol": "mV", "unit": "millivolt", "value_type": "float"}]\n', response.data)
 
-
-
     @patch('time.sleep', return_value=None)
-    def test_can_calibrate_low_point_in_atlas_scientific_ph_device(self, patched_time_sleep):
+    def test_can_calibrate_any_point_in_atlas_scientific_ph_device(self, patched_time_sleep):
 
         # Arrange
         device_address = 99
 
         self.i2cbus.read.side_effect = [
-            b'\x01?i,pH,1.98\00', # first call should be for the device info             
+            b'\x01?i,ORP,1.98\00', # first call should be for the device info             
             b'\x01\00',            # call should be to read the result from setting the calibration point
         ]
 
         request_body = {
+            'point': 'any',
             'actual_value': '225'
         }
 

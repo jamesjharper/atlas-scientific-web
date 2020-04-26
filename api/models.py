@@ -88,7 +88,7 @@ def add_device_models(self):
     })
 
     class AtlasScientificDeviceCalibrationPointSchema(Schema):
-        point = m_fields.Str(missing=None, required=False)
+        point = m_fields.Str(required=True)
         actual_value = m_fields.Str(required=True)
 
         @post_load

@@ -1,9 +1,9 @@
-from .models import AtlasScientificDeviceNotYetSupported
+from .models import AtlasScientificDeviceNotYetSupported, ExpectedValueType
 
 device_capabilities = {
     "pH": {
-        "reading": {
-            "reading_latency":  0.9,
+        "read": {
+            "latency":  0.9,
             "output": [
                 {
                     "symbol": "pH",
@@ -21,10 +21,37 @@ device_capabilities = {
                 "value_type": "float"
             },
         ],
+        "calibration": {
+            "latency":  0.9,
+            "start_points": ["mid"],
+            "points": [
+                {
+                    "id": "mid",
+                    "description": "Single point calibration at midpoint",
+                    "value_type": "float",
+                    "sub_command": "mid",
+                    "next_points": ["low", "Complete"],
+                },
+                {
+                    "id": "low",
+                    "description": "Two point calibration at lowpoint",
+                    "value_type": "float",
+                    "sub_command": "low",
+                    "next_points": ["high", "Complete"],
+                },
+                {
+                    "id": "high",
+                    "description": "Three point calibration at highpoint",
+                    "value_type": "float",
+                    "sub_command": "high",
+                    "next_points": ["Complete"],
+                }
+            ]
+        }
     },
     "ORP": {
-        "reading": {
-            "reading_latency":  0.9,
+        "read": {
+            "latency":  0.9,
             "output": [
                 {
                     "symbol": "mV",
@@ -33,10 +60,23 @@ device_capabilities = {
                 }
             ],
         },
+        "calibration": {
+            "latency":  0.9,
+            "start_points": ["any"],
+            "points": [
+                {
+                    "id": "any",
+                    "description": "calibrates the ORP circuit to a set value",
+                    "value_type": "float",
+                    "sub_command": None,
+                    "next_points": ["Complete"],
+                }
+            ]
+        }
     },
     "DO": {
-        "reading": {
-            "reading_latency":  0.9,
+        "read": {
+            "latency":  0.6,
             "output": [
                 {
                     "symbol": "%",
@@ -74,10 +114,69 @@ device_capabilities = {
                 "value_type": "float"
             },
         ],
+        "calibration": {
+            "latency":  1.3,
+            "start_points": ["atmospheric"],
+            "points": [
+                {
+                    "id": "atmospheric",
+                    "description": "Calibrate to atmospheric oxygen levels",
+                    "value_type": None,
+                    "sub_command": None,
+                    "next_points": ["0", "Complete"],
+                },
+                {
+                    "id": "0%",
+                    "description": "Calibrate device to 0% dissolved oxygen",
+                    "value_type": None,
+                    "sub_command": "0",
+                    "next_points": ["Complete"],
+                }
+            ]
+        }
+    },
+    "EC": {
+        "read": {
+            "latency":  0.6,
+        },
+        "calibration": {
+            "latency":  0.6,
+            "start_points": ["dry"],
+            "points": [
+                {
+                    "id": "dry",
+                    "description": "Dry calibration",
+                    "value_type": None,
+                    "sub_command": "dry",
+                    "next_points": ["any", "low"],
+                },
+                {
+                    "id": "any",
+                    "description": "Single point calibration of any known conductivity",
+                    "value_type": "float",
+                    "sub_command": None,
+                    "next_points": ["Complete"],
+                },
+                {
+                    "id": "low",
+                    "description": "Low end calibration of any known low conductivity",
+                    "value_type": "float",
+                    "sub_command": "low",
+                    "next_points": ["high"],
+                },
+                {
+                    "id": "high",
+                    "description": "High end calibration of any known high conductivity",
+                    "value_type": "float",
+                    "sub_command": "high",
+                    "next_points": ["Complete"],
+                }
+            ]
+        }
     },
     "CO2": {
-        "reading": {
-            "reading_latency":  0.9,
+        "read": {
+            "read_latency":  0.9,
         },
     },
 }
@@ -90,32 +189,32 @@ def get_device_capabilities(device_type):
 
 class DeviceCapabilities(object): 
     def __init__(self, capabilities_dict):
-        if "reading" in capabilities_dict:
-            self.reading = ReadingCapabilities(capabilities_dict["reading"])
+
+        if "read" in capabilities_dict:
+            self.read = ReadCapabilities(capabilities_dict["read"])
         else:
-            self.reading = None
+            self.read = None
 
         if "compensation" in capabilities_dict:
-            self.compensation = MeasurementCompensationCapabilities(capabilities_dict["compensation"])
+            self.compensation = CompensationCapabilities(capabilities_dict["compensation"])
         else:
             self.compensation = None
 
-class ReadingCapabilities(object): 
+        if "calibration" in capabilities_dict:
+            self.calibration = CalibrationCapabilities(capabilities_dict["calibration"])
+        else:
+            self.calibration = None
+
+class ReadCapabilities(object): 
     def __init__(self, capabilities_dict):
         # use default of 0.9 second if not defined 
-        self.reading_latency = capabilities_dict.get("reading_latency", 0.9) 
-        self.output = MeasurementCapabilities(capabilities_dict.get("output", []))
-
-class MeasurementCapabilities(object): 
-    def __init__(self, capabilities_dict):
-        self.units = list(MessureCapability(unit) for unit in capabilities_dict)
-
+        self.latency = capabilities_dict.get("latency", 0.9)
+        self.output = list(MessureCapability(unit) for unit in capabilities_dict.get("output", []))
+        
 class MessureCapability(object): 
     def __init__(self, capabilities_dict):
         self.unit = capabilities_dict.get("unit", "")
-        # default to string if not set, as this is a safe to parse
-        # and could end up working with the device query by chance 
-        self.value_type = capabilities_dict.get("value_type", "string")
+        self.value_type = capabilities_dict.get("value_type", "")
         self.symbol = capabilities_dict.get("symbol", "")
 
         # this is the value which will be given the the device for each command 
@@ -125,12 +224,12 @@ class MessureCapability(object):
         # {x},? request always returns units in upper case
         self.unit_code = capabilities_dict.get("unit_code", self.symbol).upper()
 
-class MeasurementCompensationCapabilities(object): 
+class CompensationCapabilities(object): 
     def __init__(self, compensation_dict):
-        factors = (MeasurementCompensationCapability(unit) for unit in compensation_dict)
+        factors = (CompensationCapability(unit) for unit in compensation_dict)
         self.factors = {f.factor:f for f in factors}
 
-class MeasurementCompensationCapability(object): 
+class CompensationCapability(object): 
     def __init__(self, compensation_dict):
 
         # TODO: throw error when this value is missing
@@ -141,8 +240,23 @@ class MeasurementCompensationCapability(object):
     
         # default to string if not set, as this is a safe to parse
         # and could end up working with the device query by chance 
-        self.value_type = compensation_dict.get("value_type", "string")
+        self.value_type = ExpectedValueType(compensation_dict.get("value_type", "string"))
 
         self.symbol = compensation_dict.get("symbol", "")
         self.unit = compensation_dict.get("unit", "")
-        
+
+class CalibrationCapabilities(object): 
+    def __init__(self, capabilities_dict):
+        # use default of 0.9 second if not defined 
+        self.latency = capabilities_dict.get("latency", 0.9) 
+        self.start_points = capabilities_dict.get("start_points", [])
+        self.points = list(CalibrationCapability(cal) for cal in capabilities_dict.get("points", []))
+
+
+class CalibrationCapability(object): 
+    def __init__(self, capabilities_dict):
+        self.id = capabilities_dict.get("id")
+        self.description = capabilities_dict.get("description", "")
+        self.value_type = ExpectedValueType(capabilities_dict.get("value_type"))
+        self.sub_command = capabilities_dict.get("sub_command")
+        self.next_points = capabilities_dict.get("next_points", [])

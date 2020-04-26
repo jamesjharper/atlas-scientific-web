@@ -60,6 +60,8 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float"}, {"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float"}]\n', response.data)
 
+    # TODO: add test for no output enabled
+
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_do_device_with_only_percent_saturation_enabled(self, datetime_now_mock, patched_time_sleep):

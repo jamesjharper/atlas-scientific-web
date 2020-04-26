@@ -89,18 +89,23 @@ class AtlasScientificDevice(object):
             return {}
 
     def get_supported_output_measurements(self):
-        return self.capabilities.reading.output.units
+        return self.capabilities.read.output
+
+    def get_supported_calibration_points(self):
+        if self.capabilities.calibration:
+            return self.capabilities.calibration.points
+        return []
 
     def get_enabled_output_measurements(self):
         if self.current_output_measurements is not None:
             return self.current_output_measurements
 
         # non output device
-        elif self.capabilities.reading == None:
+        elif self.capabilities.read == None:
             self.current_output_measurements = []
 
         # single output device
-        elif len(self.capabilities.reading.output.units) <= 1:
+        elif len(self.capabilities.read.output) <= 1:
             self.current_output_measurements = self.get_supported_output_measurements()
 
         # multi output device
@@ -159,21 +164,31 @@ class AtlasScientificDevice(object):
             if not factor: 
                 raise RequestValidationError
 
-            if not case_insensitive_eq(factor.symbol, compensation_factor.symbol):
+            if not insensitive_eq(factor.symbol, compensation_factor.symbol):
                 raise RequestValidationError
+
+            # TODO: Add check to make sure value type match
 
             self.__query(f'{factor.command},{compensation_factor.value}', self.device_request_latency)
 
-    def set_calibration_point(self, calibration_point):
-        # TODO: needs input validation
+    def set_calibration_point(self, calibration):
+        points = self.get_supported_calibration_points()
+        
+        cal_point = next((p for p in points if insensitive_eq(p.id, calibration.point)), None)
+        
+        if not cal_point:
+            raise RequestValidationError
 
-        if calibration_point.point:
-            self.__query_cal_point(calibration_point.point, calibration_point.actual_value)
-        else:
-            self.__query_cal(calibration_point.actual_value)
+        cal_request = 'Cal'
+        if cal_point.sub_command:
+            cal_request = f"{cal_request},{cal_point.sub_command}"
 
-    def __query_cal_point(self, point, value): 
-        return self.__query(f'Cal,{point},{value}', self.capabilities.reading.reading_latency)
+        if cal_point.value_type:
+            
+            cal_point.value_type.validate_is_of_type(calibration.actual_value)
+            cal_request = f"{cal_request},{calibration.actual_value}"
+
+        return self.__query(cal_request, self.capabilities.calibration.latency)
 
     def __invalidate_output_measurements_cache(self):
         self.current_output_measurements = None # flag for lazy update
@@ -196,19 +211,13 @@ class AtlasScientificDevice(object):
 
     def __query_r(self): 
         output_units = self.get_enabled_output_measurements()
-        result = self.__query('r', self.capabilities.reading.reading_latency)
+        result = self.__query('r', self.capabilities.read.latency)
         return AtlasScientificDeviceSample.from_expected_device_output(result, output_units)
 
     def __query_rt(self, temperature): 
         output_units = self.get_enabled_output_measurements()
-        result = self.__query(f'rt,{temperature}', self.capabilities.reading.reading_latency)
+        result = self.__query(f'rt,{temperature}', self.capabilities.read.latency)
         return AtlasScientificDeviceSample.from_expected_device_output(result, output_units)
-
-    def __query_cal(self, value): 
-        return self.__query(f'Cal,{value}', self.capabilities.reading.reading_latency)
-
-    def __query_cal_point(self, point, value): 
-        return self.__query(f'Cal,{point},{value}', self.capabilities.reading.reading_latency)
 
     def __query(self, query, process_delay):
         query_bytes = query.encode('ascii') + b'\00'
@@ -241,9 +250,11 @@ class AtlasScientificDevice(object):
             raise AtlasScientificSyntaxError
         return response
     
-def case_insensitive_eq(a, b):
+def insensitive_eq(a, b):
     return a.lower() == b.lower()
 
 # code stem needed to unit test date times
 def get_datetime_now(tz):
     return datetime.now(tz)
+
+

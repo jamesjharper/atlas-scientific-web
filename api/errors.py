@@ -97,10 +97,4 @@ def add_device_errors(self):
             'message': 'Unexpected internal error occurred.'
         }, 500
 
-    def default_error_handler(error):
-        return {
-            'error_code': 'UNEXPECTED_ERROR', 
-            'message': 'Unexpected internal error occurred.'
-        }, 500
-
 Namespace.add_device_errors = add_device_errors
