@@ -1,6 +1,6 @@
 import unittest
 import api
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from parameterized import parameterized
 from i2c import I2CBus
@@ -62,7 +62,8 @@ class ModelValidationTests(unittest.TestCase):
             }],
         ],
     ])
-    def test_should_return_invalid_request_error(self, name, method, url, request_body):
+    @patch('time.sleep', return_value=None)
+    def test_should_return_invalid_request_error(self, name, method, url, request_body, _):
 
         self.i2cbus.read.side_effect = [ 
                 b'\x01?I,DO,1.98\00',
@@ -105,7 +106,8 @@ class ModelValidationTests(unittest.TestCase):
             }],
         ],
     ])
-    def test_should_return_invalid_request(self, name, method, url, request_body):
+    @patch('time.sleep', return_value=None)
+    def test_should_return_invalid_request(self, name, method, url, request_body, _):
         self.i2cbus.read.side_effect = [ 
                 b'\x01?I,DO,1.98\00',
             ]
@@ -117,6 +119,29 @@ class ModelValidationTests(unittest.TestCase):
         # Assert
         self.assertEqual(response.status_code, 400)
         self.assertEqual(b'{"message": "Request contains a missing or incorrectly formatted felid.", "error_code": "INVALID_REQUEST_ERROR"}\n', response.data)
+
+    @parameterized.expand([
+        [
+            'when_compensation_factor_does_not_exist_for_device', 
+            'post', '/api/device/97/sample/output', 
+            ['unicorns'],
+        ],
+    ])
+    @patch('time.sleep', return_value=None)
+    def test_should_return_invalid_request(self, name, method, url, request_body, _):
+        self.i2cbus.read.side_effect = [ 
+                b'\x01?I,DO,1.98\00', # call should be for the device info
+                b'\x01?O\00',       # call should be to read the current device outputs
+            ]
+
+        # Act
+        http_method = getattr(self.app, method)
+        response = http_method(url, json=request_body, follow_redirects=True)
+        
+        # Assert
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(b'{"message": "Request contains a missing or incorrectly formatted felid.", "error_code": "INVALID_REQUEST_ERROR"}\n', response.data)
+
 
 
     @parameterized.expand([
@@ -154,7 +179,8 @@ class ModelValidationTests(unittest.TestCase):
             },
         ],
     ])
-    def test_should_return_invalid_request_for_ph_device(self, name, method, url, request_body):
+    @patch('time.sleep', return_value=None)
+    def test_should_return_invalid_request_for_ph_device(self, name, method, url, request_body, _):
         self.i2cbus.read.side_effect = [ 
                 b'\x01?i,pH,1.98\00' # pH device expects a calibration point
             ]

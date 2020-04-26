@@ -122,11 +122,16 @@ class AtlasScientificDevice(object):
 
     def set_enabled_output_measurements(self, units):
         # find all the measurements which currently are enabled, and need to be disabled
+        supported_units = set(m.unit_code for m in self.get_supported_output_measurements())
         current_enabled_units = set(m.unit_code for m in self.get_enabled_output_measurements())
         requested_units_to_enable = set((u.upper() for u in units))
 
         units_to_disable = current_enabled_units - requested_units_to_enable
         units_to_enable = requested_units_to_enable - current_enabled_units
+        unsupported_units = units_to_enable - supported_units
+
+        if not len(unsupported_units) is 0:
+            raise RequestValidationError
 
         for unit in units_to_enable:
             self.__query_o_enable(unit)
@@ -142,6 +147,7 @@ class AtlasScientificDevice(object):
         for cf in compensation_factors:
             # Currently the only documented compensation factors
             # which can be rolled into the read command
+            # this code assume you have the lastest firmware on your device
             if cf.factor.lower() == "temperature":
                 temperature_cf = cf
             else:
