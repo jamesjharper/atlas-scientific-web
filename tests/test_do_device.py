@@ -44,7 +44,7 @@ class DoDeviceTests(unittest.TestCase):
         patched_time_sleep.assert_has_calls([
                 call(0.3), # "i"
                 call(0.3), # "o,?"
-                call(0.9)  # "r"
+                call(0.6)  # "r"
             ], 
             any_order=False)
 
@@ -88,7 +88,7 @@ class DoDeviceTests(unittest.TestCase):
         patched_time_sleep.assert_has_calls([
                 call(0.3), # "i"
                 call(0.3), # "o,?"
-                call(0.9)  # "r"
+                call(0.6)  # "r"
             ], 
             any_order=False)
 
@@ -132,7 +132,7 @@ class DoDeviceTests(unittest.TestCase):
         patched_time_sleep.assert_has_calls([
                 call(0.3), # "i"
                 call(0.3), # "o,?"
-                call(0.9)  # "r"
+                call(0.6)  # "r"
             ], 
             any_order=False)
 
@@ -189,7 +189,7 @@ class DoDeviceTests(unittest.TestCase):
                 call(0.3), # "o,mg,1"
                 call(0.3), # "o,%,0"
                 call(0.3), # "o,?"
-                call(0.9)  # "r"
+                call(0.6)  # "r"
             ], 
             any_order=False)
 
@@ -294,7 +294,7 @@ class DoDeviceTests(unittest.TestCase):
                 call(0.3), # "o,?"
                 call(0.3), # "o,mg,1"
                 call(0.3), # "o,?"
-                call(0.9)  # "r"
+                call(0.6)  # "r"
             ], 
             any_order=False)
 
