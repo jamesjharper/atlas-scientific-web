@@ -94,7 +94,7 @@ device_capabilities = {
         "compensation": [
             {
                 "factor": "Salinity",
-                "symbol": "μS",
+                "symbol": '\u03bcS',
                 "unit": "microsiemens",
                 "command": "S",
                 "value_type": "float"
@@ -138,7 +138,42 @@ device_capabilities = {
     "EC": {
         "read": {
             "latency":  0.6,
+             "output": [
+                {
+                    "symbol": "EC", 
+                    "unit": "Conductivity",
+                    "unit_code": "EC",
+                    "value_type": "float"
+                },
+                {
+                    "symbol": "T.D.S.", 
+                    "unit": "Total Dissolved Solids",
+                    "unit_code": "TDS",
+                    "value_type": "float"
+                },
+                {
+                    "symbol": '\u03bcS', 
+                    "unit": "microsiemens",
+                    "unit_code": "S",
+                    "value_type": "float"
+                },
+                {
+                    "symbol": "S.G.", 
+                    "unit": "Specific Gravity",
+                    "unit_code": "SG",
+                    "value_type": "float"
+                }
+            ],
         },
+        "compensation": [
+            {
+                "factor": "Temperature",
+                "symbol": "°C",
+                "unit": "degrees Celsius",
+                "command": "T",
+                "value_type": "float"
+            },
+        ],
         "calibration": {
             "latency":  0.6,
             "start_points": ["dry"],
