@@ -113,15 +113,27 @@ class AtlasScientificDeviceCompensationFactor(object):
         self.value = value
 
 class AtlasScientificDeviceCalibrationPoint(object): 
-    def __init__(self, actual_value, point):
+    def __init__(self, point, actual_value = None ):
         self.point = point
         self.actual_value = actual_value
 
 class ExpectedValueType(object):
     def __init__(self, expected_value_type):
+        if expected_value_type:
             self.t = expected_value_type
+        else:
+            self.t = "none"
+    
+    @property
+    def is_none(self):
+        return self.t == "none"
 
     def validate_is_of_type(self, value):
+        if not value:
+            if self.t == "none":
+                return None
+            raise RequestValidationError
+
         try:
             if self.t == "float":
                 return float(value)

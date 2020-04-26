@@ -476,4 +476,85 @@ class DoDeviceTests(unittest.TestCase):
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
 
+    @patch('time.sleep', return_value=None)
+    def test_can_calibrate_0_mg_point_in_atlas_scientific_do_device(self, patched_time_sleep):
+
+        # Arrange
+        device_address = 99
+
+        self.i2cbus.read.side_effect = [
+            b'\x01?I,DO,1.98\00', # first call should be for the device info             
+            b'\x01\00',            # call should be to read the result from setting the calibration point
+        ]
+
+        request_body = {
+            'point': '0'
+        }
+
+        response = self.app.put('/api/device/99/sample/calibration', json=request_body, follow_redirects=True)
+
+        # Assert
+        self.i2cbus.write.assert_has_calls([
+                call(device_address, b'i\00'),   # expect 'i' for read info
+                call(device_address, b'Cal,0\00'), # expect 'Cal,0' for setting 0mg the calibration point
+            ], 
+            any_order=False)
+
+        # expect to wait for result to be ready
+        patched_time_sleep.assert_has_calls([
+                call(0.3), # "i"
+                call(1.3), # "Cal,0"
+            ], 
+            any_order=False)
+
+        # expect device info to be read from bus
+        self.i2cbus.read.assert_has_calls([
+                call(device_address), 
+                call(device_address)
+            ], 
+            any_order=False)
+
+        self.assertEqual(response.status_code, 200)
+
+    @patch('time.sleep', return_value=None)
+    def test_can_calibrate_0_mg_point_in_atlas_scientific_do_device(self, patched_time_sleep):
+
+        # Arrange
+        device_address = 99
+
+        self.i2cbus.read.side_effect = [
+            b'\x01?I,DO,1.98\00', # first call should be for the device info             
+            b'\x01\00',            # call should be to read the result from setting the calibration point
+        ]
+
+        request_body = {
+            'point': 'atmospheric'
+        }
+
+        response = self.app.put('/api/device/99/sample/calibration', json=request_body, follow_redirects=True)
+
+        # Assert
+        self.i2cbus.write.assert_has_calls([
+                call(device_address, b'i\00'),   # expect 'i' for read info
+                call(device_address, b'Cal\00'), # expect 'Cal' for setting 0mg the calibration point
+            ], 
+            any_order=False)
+
+        # expect to wait for result to be ready
+        patched_time_sleep.assert_has_calls([
+                call(0.3), # "i"
+                call(1.3), # "Cal"
+            ], 
+            any_order=False)
+
+        # expect device info to be read from bus
+        self.i2cbus.read.assert_has_calls([
+                call(device_address), 
+                call(device_address)
+            ], 
+            any_order=False)
+
+        self.assertEqual(response.status_code, 200)
+
 # TODO: add test for when attempting to enable unit which is not supported
+#atmospheric

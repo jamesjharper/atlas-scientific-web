@@ -89,7 +89,7 @@ def add_device_models(self):
 
     class AtlasScientificDeviceCalibrationPointSchema(Schema):
         point = m_fields.Str(required=True)
-        actual_value = m_fields.Str(required=True)
+        actual_value = m_fields.Str(required=False)
 
         @post_load
         def make(self, data, **kwargs):

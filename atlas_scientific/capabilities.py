@@ -126,7 +126,7 @@ device_capabilities = {
                     "next_points": ["0", "Complete"],
                 },
                 {
-                    "id": "0%",
+                    "id": "0",
                     "description": "Calibrate device to 0% dissolved oxygen",
                     "value_type": None,
                     "sub_command": "0",

@@ -183,8 +183,7 @@ class AtlasScientificDevice(object):
         if cal_point.sub_command:
             cal_request = f"{cal_request},{cal_point.sub_command}"
 
-        if cal_point.value_type:
-            
+        if not cal_point.value_type.is_none:
             cal_point.value_type.validate_is_of_type(calibration.actual_value)
             cal_request = f"{cal_request},{calibration.actual_value}"
 
