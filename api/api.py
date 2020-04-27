@@ -3,7 +3,7 @@ import logging
 import sys
 
 from flask import Flask, request
-from flask_restx import Api, Resource
+from flask_restx import Api, Resource, marshal
 
 from .models import add_device_models
 from .errors import add_device_errors
@@ -90,7 +90,7 @@ def create_app(i2cbus =I2CBus()):
                     'value_type': sample_output.value_type,
                     'is_enable': sample_output.unit_code in enabled_outputs
                 })
-            
+
             return sample_outputs
 
         @device_ns.expect(models.set_device_sample_outputs)
@@ -120,5 +120,18 @@ def create_app(i2cbus =I2CBus()):
             device.set_calibration_point(calibration_point)
 
             return '', 200
+
+    @device_ns.route('/<int:address>/configuration')
+    class DeviceConfiguration(Resource):
+
+        @device_ns.expect(models.device_configuration_parameter)
+        def post(self, address):
+            configuration_parameter = models.device_configuration_parameter_schema.load_request(request)
+            device = device_bus.get_device_by_address(address)
+            device.set_configuration_parameter(configuration_parameter)
+
+            return '', 200
+
+    
 
     return app

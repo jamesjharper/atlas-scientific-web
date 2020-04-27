@@ -89,12 +89,24 @@ class AtlasScientificDevice(object):
             return {}
 
     def get_supported_output_measurements(self):
-        return self.capabilities.read.output
+        if self.capabilities.read.output:
+            return self.capabilities.read.output
+        return []
 
     def get_supported_calibration_points(self):
         if self.capabilities.calibration:
             return self.capabilities.calibration.points
         return []
+
+    def get_supported_configuration_parameters(self):
+        if self.capabilities.configuration:
+            return self.capabilities.configuration.parameters
+        return {}
+
+    def set_configuration_parameter(self, parameter_details):
+        parameter = self.__get_configuration_parameter(parameter_details)
+        parameter.value_type.validate_is_of_type(parameter_details.value)
+        self.__query(f'{parameter.command},{parameter_details.value}', self.device_request_latency)
 
     def get_enabled_output_measurements(self):
         if self.current_output_measurements is not None:
@@ -201,6 +213,15 @@ class AtlasScientificDevice(object):
             raise RequestValidationError
     
         return factor
+
+    def __get_configuration_parameter(self, parameter_details):
+        parameters = self.get_supported_configuration_parameters()
+        parameter = parameters.get(parameter_details.parameter.lower(), None)
+         
+        if not parameter: 
+            raise RequestValidationError
+    
+        return parameter
 
     def __invalidate_output_measurements_cache(self):
         self.current_output_measurements = None # flag for lazy update

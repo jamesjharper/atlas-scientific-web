@@ -117,6 +117,11 @@ class AtlasScientificDeviceCalibrationPoint(object):
         self.point = point
         self.actual_value = actual_value
 
+class AtlasScientificDeviceConfigurationParameter(object): 
+    def __init__(self, parameter, value):
+        self.parameter = parameter
+        self.value = value
+
 class ExpectedValueType(object):
     def __init__(self, expected_value_type):
         if expected_value_type:

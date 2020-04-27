@@ -444,7 +444,7 @@ class DoDeviceTests(unittest.TestCase):
 
         self.i2cbus.read.side_effect = [ 
                 b'\x01?I,DO,1.98\00', # first call should be for the device info
-                b'\x01\00',             # call should be to read the result from setting the μS compensation
+                b'\x01\00',             # call should be to read the result from setting the T compensation
             ]
 
         # Act

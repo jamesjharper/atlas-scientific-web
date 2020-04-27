@@ -1,6 +1,9 @@
 from flask_restx import Api, Resource, fields, Namespace
 from marshmallow import ValidationError, Schema, post_load, fields as m_fields
-from atlas_scientific.models import AtlasScientificDeviceCompensationFactor, AtlasScientificDeviceCalibrationPoint
+from atlas_scientific.models import \
+    AtlasScientificDeviceCompensationFactor, \
+    AtlasScientificDeviceCalibrationPoint, \
+    AtlasScientificDeviceConfigurationParameter
 
 class DeviceModels(object):
     pass
@@ -125,6 +128,30 @@ def add_device_models(self):
             return AtlasScientificDeviceCompensationFactor(**data)
         
     m.device_compensation_factors_schema = AtlasScientificDeviceCompensationFactorSchema(many=True)
+
+    m.device_configuration_parameter = self.model('device_configuration_parameter', {
+        'parameter': fields.String(
+            description='The configuration parameter to set.',
+            example="name",
+            required=True
+        ),
+        'value': fields.String(
+            description='The value to set the configuration as.',
+            example='DeviceName',
+            required=True
+        ), 
+    })
+
+    class AtlasScientificDeviceConfigurationParameterSchema(Schema):
+        parameter = m_fields.Str(required=True)
+        value = m_fields.Str(required=True)
+
+        @post_load
+        def make(self, data, **kwargs):
+            return AtlasScientificDeviceConfigurationParameter(**data)
+        
+    m.device_configuration_parameter_schema = AtlasScientificDeviceConfigurationParameterSchema()
+    
     return m
 
 Namespace.add_device_models = add_device_models

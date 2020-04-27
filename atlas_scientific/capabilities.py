@@ -94,7 +94,7 @@ device_capabilities = {
         "compensation": [
             {
                 "factor": "Salinity",
-                "symbol": '\u03bcS',
+                "symbol": u'\u03bcS',
                 "unit": "microsiemens",
                 "command": "S",
                 "value_type": "float"
@@ -152,7 +152,7 @@ device_capabilities = {
                     "value_type": "float"
                 },
                 {
-                    "symbol": '\u03bcS', 
+                    "symbol": u'\u03bcS', 
                     "unit": "microsiemens",
                     "unit_code": "S",
                     "value_type": "float"
@@ -207,7 +207,15 @@ device_capabilities = {
                     "next_points": ["Complete"],
                 }
             ]
-        }
+        },
+        "configuration": [
+            {
+                "parameter": "K",
+                "description": "Conductivity of probe",
+                "command": "K",
+                "value_type": "float"
+            },
+        ]
     },
     "CO2": {
         "read": {
@@ -240,12 +248,18 @@ class DeviceCapabilities(object):
         else:
             self.calibration = None
 
+        if "configuration" in capabilities_dict:
+            self.configuration = ConfigurationCapabilities(capabilities_dict["configuration"])
+        else:
+            self.configuration = None
+
 class ReadCapabilities(object): 
     def __init__(self, capabilities_dict):
         # use default of 0.9 second if not defined 
         self.latency = capabilities_dict.get("latency", 0.9)
         self.output = list(MessureCapability(unit) for unit in capabilities_dict.get("output", []))
         
+
 class MessureCapability(object): 
     def __init__(self, capabilities_dict):
         self.unit = capabilities_dict.get("unit", "")
@@ -287,7 +301,6 @@ class CalibrationCapabilities(object):
         self.start_points = capabilities_dict.get("start_points", [])
         self.points = list(CalibrationCapability(cal) for cal in capabilities_dict.get("points", []))
 
-
 class CalibrationCapability(object): 
     def __init__(self, capabilities_dict):
         self.id = capabilities_dict.get("id")
@@ -295,3 +308,15 @@ class CalibrationCapability(object):
         self.value_type = ExpectedValueType(capabilities_dict.get("value_type"))
         self.sub_command = capabilities_dict.get("sub_command")
         self.next_points = capabilities_dict.get("next_points", [])
+
+class ConfigurationCapabilities(object): 
+    def __init__(self, capabilities_dict):
+        parameters = (ConfigurationCapability(p) for p in capabilities_dict)
+        self.parameters = {p.parameter:p for p in parameters}
+
+class ConfigurationCapability(object): 
+    def __init__(self, capabilities_dict):
+        self.parameter = capabilities_dict["parameter"].lower()
+        self.description = capabilities_dict["description"]
+        self.value_type = ExpectedValueType(capabilities_dict["value_type"])
+        self.command = capabilities_dict["command"].lower()
