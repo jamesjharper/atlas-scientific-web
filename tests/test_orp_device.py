@@ -165,7 +165,6 @@ class OrpDeviceTests(unittest.TestCase):
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
 
-
     # Calibration tests
 
     @patch('time.sleep', return_value=None)
