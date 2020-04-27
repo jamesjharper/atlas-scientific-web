@@ -390,6 +390,52 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(b'[{"is_enable": true, "symbol": "%", "unit": "Percent saturation", "value_type": "float"}, {"is_enable": false, "symbol": "mg/L", "unit": "milligram per litre", "value_type": "float"}]\n', response.data)
 
+    # configuration tests
+
+    @patch('time.sleep', return_value=None)
+    def test_can_configure_device_name_in_atlas_scientific_do_device(self, patched_time_sleep):
+
+        # Arrange
+        device_address = 97
+
+        self.i2cbus.read.side_effect = [ 
+                b'\x01?I,DO,1.98\00', # first call should be for the device info
+                b'\x01\00',           # second call should be to read the result from setting the device name
+            ]
+
+        # Act
+        request_body = {
+            'parameter': 'name',
+            'value': 'do_device'
+        }
+
+        response = self.app.post(f'/api/device/{device_address}/configuration', json=request_body, follow_redirects=True)
+
+        # Assert
+        self.i2cbus.write.assert_has_calls([
+                call(device_address, b'i\00'),              # expect 'i' for read info
+                call(device_address, b'name,do_device\00'), # expect 'name,do_device' for setting the device name
+            ], 
+            any_order=False)
+
+        # expect to wait for result to be ready
+        patched_time_sleep.assert_has_calls([
+                call(0.3), # "i"
+                call(0.3), # "name,ec_device"
+            ], 
+            any_order=False)
+
+        # expect device info to be read from bus
+        self.i2cbus.read.assert_has_calls([
+                call(device_address), 
+                call(device_address)
+            ], 
+            any_order=False)
+
+        # expect a empty json list 
+        self.assertEqual(response.status_code, 200)
+
+
     # compensation tests
 
     @patch('time.sleep', return_value=None)

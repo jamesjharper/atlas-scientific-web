@@ -133,7 +133,15 @@ device_capabilities = {
                     "next_points": ["Complete"],
                 }
             ]
-        }
+        },
+         "configuration": [
+            {
+                "parameter": "Name",
+                "description": "The name of the device",
+                "command": "name",
+                "value_type": "string"
+            }
+        ]
     },
     "EC": {
         "read": {

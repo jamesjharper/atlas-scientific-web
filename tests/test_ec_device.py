@@ -325,7 +325,6 @@ class EcDeviceTests(unittest.TestCase):
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
 
-
     @patch('time.sleep', return_value=None)
     def test_can_configure_device_name_in_atlas_scientific_ec_device(self, patched_time_sleep):
 
@@ -368,7 +367,6 @@ class EcDeviceTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-
 
     # calibration tests
 
