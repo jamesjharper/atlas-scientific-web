@@ -210,6 +210,12 @@ device_capabilities = {
         },
         "configuration": [
             {
+                "parameter": "Name",
+                "description": "The name of the device",
+                "command": "name",
+                "value_type": "string"
+            },
+            {
                 "parameter": "K",
                 "description": "Conductivity of probe",
                 "command": "K",
