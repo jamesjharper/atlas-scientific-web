@@ -72,7 +72,15 @@ device_capabilities = {
                     "next_points": ["Complete"],
                 }
             ]
-        }
+        },
+        "configuration": [
+            {
+                "parameter": "Name",
+                "description": "The name of the device",
+                "command": "name",
+                "value_type": "string"
+            }
+        ]
     },
     "DO": {
         "read": {
@@ -134,7 +142,7 @@ device_capabilities = {
                 }
             ]
         },
-         "configuration": [
+        "configuration": [
             {
                 "parameter": "Name",
                 "description": "The name of the device",
