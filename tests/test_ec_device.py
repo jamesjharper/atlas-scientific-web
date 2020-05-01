@@ -232,8 +232,6 @@ class EcDeviceTests(unittest.TestCase):
 
         self.assertEqual(expected_response.encode('utf8'), response.data)
 
-
-
     # compensation tests
 
     @patch('time.sleep', return_value=None)

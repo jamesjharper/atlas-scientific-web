@@ -180,7 +180,7 @@ device_capabilities = {
     "EC": {
         "read": {
             "latency":  0.6,
-             "output": [
+            "output": [
                 {
                     "symbol": "EC", 
                     "unit": "Conductivity",
@@ -273,8 +273,36 @@ device_capabilities = {
     },
     "CO2": {
         "read": {
-            "read_latency":  0.9,
+            "latency":  0.9,
+            "output": [
+                {
+                    "symbol": "ppm",
+                    "unit": "Gaseous CO2",
+                    "unit_code": "ppm",
+                    "value_type": "int"
+                },
+                {
+                    "symbol": "°C", 
+                    "unit": "Internal device temperature",
+                    "unit_code": "t",
+                    "value_type": "float"
+                },
+            ],
         },
+        "configuration": [
+            {
+                "parameter": "Name",
+                "description": "The name of the device",
+                "command": "name",
+                "value_type": "string"
+            },
+            {
+                "parameter": "LED",
+                "description": "Enabled/Disables the device's indicator LED's",
+                "command": "L",
+                "value_type": "bool"
+            },
+        ]
     },
 }
 

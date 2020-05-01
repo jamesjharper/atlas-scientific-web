@@ -211,7 +211,7 @@ class OrpDeviceTests(unittest.TestCase):
     # Calibration tests
 
     @patch('time.sleep', return_value=None)
-    def test_can_calibrate_any_point_in_atlas_scientific_ph_device(self, patched_time_sleep):
+    def test_can_calibrate_any_point_in_atlas_scientific_orp_device(self, patched_time_sleep):
 
         # Arrange
         device_address = 99

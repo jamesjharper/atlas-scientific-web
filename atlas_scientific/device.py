@@ -128,12 +128,14 @@ class AtlasScientificDevice(object):
             result = self.__query_o()
 
             # order must be presserved as this is the same order the device will list the values back with the 'r' command
-            self.current_output_measurements = list([u for u in [supported_unit_codes.get(ui, None) for ui in result.units] if u])
+            self.current_output_measurements = list([u for u in [supported_unit_codes.get(ui.upper(), None) for ui in result.units] if u])
 
         return self.current_output_measurements
 
     def set_enabled_output_measurements(self, units):
         # find all the measurements which currently are enabled, and need to be disabled
+
+        # TODO: this doesnt feel correct, should ideally be enabling by something other then unit code
         supported_units = set(m.unit_code for m in self.get_supported_output_measurements())
         current_enabled_units = set(m.unit_code for m in self.get_enabled_output_measurements())
         requested_units_to_enable = set((u.upper() for u in units))
@@ -286,7 +288,7 @@ class AtlasScientificDevice(object):
 def insensitive_eq(a, b):
     return a.lower() == b.lower()
 
-# code stem needed to unit test date times
+# code seam needed to inject date times in tests
 def get_datetime_now(tz):
     return datetime.now(tz)
 
