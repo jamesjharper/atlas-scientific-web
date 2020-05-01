@@ -54,7 +54,13 @@ device_capabilities = {
                 "description": "The name of the device",
                 "command": "name",
                 "value_type": "string"
-            }
+            },
+            {
+                "parameter": "LED",
+                "description": "Enabled/Disables the device's indicator LED's",
+                "command": "L",
+                "value_type": "bool"
+            },
         ]
     },
     "ORP": {
