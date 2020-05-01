@@ -134,19 +134,25 @@ class ExpectedValueType(object):
         return self.t == "none"
 
     def validate_is_of_type(self, value):
-        if not value:
-            if self.t == "none":
-                return None
-            raise RequestValidationError
-
         try:
-            if self.t == "float":
-                return float(value)
+            if not value:
+                if self.t == "none":
+                    return None
+                raise RequestValidationError
+
+            elif self.t == "float":
+                float(value)
             elif self.t == "int":
-                return int(value)
+                int(value)
             elif self.t == "string":
-                return str(value)
-            elif self.t == "string":
-                return bool(value)
+                pass
+            elif self.t == "bool":
+                if value.lower() in ['false', '0','no']:
+                    return '0'
+                if value.lower() in ['true', '1','yes']:
+                    return '1'
+                raise RequestValidationError  
+            
+            return value
         except ValueError:
             raise RequestValidationError

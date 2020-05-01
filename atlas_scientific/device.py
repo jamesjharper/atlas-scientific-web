@@ -105,8 +105,8 @@ class AtlasScientificDevice(object):
 
     def set_configuration_parameter(self, parameter_details):
         parameter = self.__get_configuration_parameter(parameter_details)
-        parameter.value_type.validate_is_of_type(parameter_details.value)
-        self.__query(f'{parameter.command},{parameter_details.value}', self.device_request_latency)
+        value = parameter.value_type.validate_is_of_type(parameter_details.value)
+        self.__query(f'{parameter.command},{value}', self.device_request_latency)
 
     def get_enabled_output_measurements(self):
         if self.current_output_measurements is not None:
@@ -170,9 +170,9 @@ class AtlasScientificDevice(object):
 
         if temperature_cf:
             factor = self.__get_measurement_compensation_factor(temperature_cf)
-            factor.value_type.validate_is_of_type(temperature_cf.value)
+            value = factor.value_type.validate_is_of_type(temperature_cf.value)
 
-            return self.__query_rt(temperature_cf.value)
+            return self.__query_rt(value)
         else:
             return self.__query_r()
 
@@ -180,9 +180,9 @@ class AtlasScientificDevice(object):
 
         for compensation_factor in compensation_factors:
             factor = self.__get_measurement_compensation_factor(compensation_factor)
-            factor.value_type.validate_is_of_type(compensation_factor.value)
+            value = factor.value_type.validate_is_of_type(compensation_factor.value)
 
-            self.__query(f'{factor.command},{compensation_factor.value}', self.device_request_latency)
+            self.__query(f'{factor.command},{value}', self.device_request_latency)
 
     def set_calibration_point(self, calibration):
         points = self.get_supported_calibration_points()
@@ -197,8 +197,8 @@ class AtlasScientificDevice(object):
             cal_request = f"{cal_request},{cal_point.sub_command}"
 
         if not cal_point.value_type.is_none:
-            cal_point.value_type.validate_is_of_type(calibration.actual_value)
-            cal_request = f"{cal_request},{calibration.actual_value}"
+            value = cal_point.value_type.validate_is_of_type(calibration.actual_value)
+            cal_request = f"{cal_request},{value}"
 
         return self.__query(cal_request, self.capabilities.calibration.latency)
 

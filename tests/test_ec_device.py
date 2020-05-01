@@ -326,7 +326,7 @@ class EcDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     @patch('time.sleep', return_value=None)
-    def test_can_configure_device_name_in_atlas_scientific_ec_device(self, patched_time_sleep):
+    def test_can_configure_device_leds_in_atlas_scientific_ec_device(self, patched_time_sleep):
 
         # Arrange
         device_address = 100
@@ -338,16 +338,16 @@ class EcDeviceTests(unittest.TestCase):
 
         # Act
         request_body = {
-            'parameter': 'name',
-            'value': 'ec_device'
+            'parameter': 'led',
+            'value': 'true'
         }
 
         response = self.app.post('/api/device/100/configuration', json=request_body, follow_redirects=True)
 
         # Assert
         self.i2cbus.write.assert_has_calls([
-                call(device_address, b'i\00'),     # expect 'i' for read info
-                call(device_address, b'name,ec_device\00'), # expect 'name,ec_device' for setting the device name
+                call(device_address, b'i\00'),   # expect 'i' for read info
+                call(device_address, b'l,1\00'), # expect 'l,1' for setting the device name
             ], 
             any_order=False)
 
