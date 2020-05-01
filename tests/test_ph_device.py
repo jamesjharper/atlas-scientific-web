@@ -146,6 +146,7 @@ class PhDeviceTests(unittest.TestCase):
         self.assertEqual(response1.status_code, 200)
         self.assertEqual(response2.status_code, 200)
 
+
     # Sample output tests
 
     @patch('time.sleep', return_value=None)
