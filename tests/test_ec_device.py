@@ -354,7 +354,7 @@ class EcDeviceTests(unittest.TestCase):
         # expect to wait for result to be ready
         patched_time_sleep.assert_has_calls([
                 call(0.3), # "i"
-                call(0.3), # "name,ec_device"
+                call(0.3), # "l,1"
             ], 
             any_order=False)
 
