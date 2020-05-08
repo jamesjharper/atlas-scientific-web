@@ -304,6 +304,45 @@ device_capabilities = {
             },
         ]
     },
+    "RTD": {
+        "read": {
+            "latency":  0.6,
+            "output": [
+                {
+                    "symbol": "°", 
+                    "unit": "Temperature",
+                    "value_type": "float"
+                },
+            ],
+        },
+        "calibration": {
+            "latency":  0.6,
+            "start_points": ["any"],
+            "points": [
+                {
+                    "id": "any",
+                    "description": "calibrates the temperature to a set value",
+                    "value_type": "float",
+                    "sub_command": None,
+                    "next_points": ["Complete"],
+                }
+            ]
+        },
+        "configuration": [
+            {
+                "parameter": "Name",
+                "description": "The name of the device",
+                "command": "name",
+                "value_type": "string"
+            },
+            {
+                "parameter": "LED",
+                "description": "Enabled/Disables the device's indicator LED's",
+                "command": "L",
+                "value_type": "bool"
+            },
+        ]
+    },
 }
 
 def get_device_capabilities(device_type):
