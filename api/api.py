@@ -48,21 +48,21 @@ def create_app(i2cbus =I2CBus()):
     def index(path):
 
         bg_lookup = {
-            'pH': 'bg-success',
+            'pH': 'bg-danger',
             'ORP': 'bg-info',
             'DO': 'bg-warning',
             'EC': 'bg-success',
+            'RTD': 'bg-dark'
         }
 
         device_elements = []
         for device in device_bus.get_known_devices():
             device_sample = device.read_sample([])
-            device_type = device.get_device_info().device_type;
+            device_type = device.get_device_info().device_type
             device_colour = bg_lookup[device_type]
 
             sample_value = ' / '.join(f"{sample.value} {sample.symbol}" for sample in device_sample)
             device_elements.append(f'<div class="p-3 mb-2 {device_colour} text-white"><h1>{device_type} : {sample_value}</h1></div>')
-
 
         return f"""
             <!DOCTYPE html>
@@ -78,7 +78,10 @@ def create_app(i2cbus =I2CBus()):
                 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
             </head>
             <body>
-                {''.join(device_elements)}
+                <div class="p-3 mb-2 bg-secondary text-white">
+                    <h1>SAMPLES</h1>
+                    {''.join(device_elements)}
+                </div>
             </body>
             </html>
         """

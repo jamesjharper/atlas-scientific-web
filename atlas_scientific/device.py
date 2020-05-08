@@ -29,6 +29,8 @@ class AtlasScientificDeviceBus(object):
                 pass
 
     def get_known_devices(self):
+        if len(self.known_devices) == 0:
+            self.scan_for_devices()
         return self.known_devices.values()
 
     def get_device_by_address(self, address):
