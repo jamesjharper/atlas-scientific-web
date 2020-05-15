@@ -2,7 +2,7 @@ import os
 import logging
 import sys
 
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_restx import Api, Resource, marshal
 from flask_cors import CORS
 
@@ -26,7 +26,7 @@ def create_app(i2cbus =I2CBus()):
     config_logging()
     logging_application_banner()
 
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='../../build')
     CORS(app)
 
     api = Api(app, version='1.0', title='I2C Microserverice',
@@ -43,48 +43,14 @@ def create_app(i2cbus =I2CBus()):
     def log_request_info():
         app.logger.debug('\n[%s] %s\nBody:\n%s', request.method , request.path, request.get_data())
 
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def index(path):
+    
+    @app.route('/<path:path>', methods=['GET'])
+    def static_proxy(path):
+        return send_from_directory(app.static_folder, path)
 
-        bg_lookup = {
-            'pH': 'bg-danger',
-            'ORP': 'bg-info',
-            'DO': 'bg-warning',
-            'EC': 'bg-success',
-            'RTD': 'bg-dark'
-        }
-
-        device_elements = []
-        for device in device_bus.get_known_devices():
-            device_sample = device.read_sample([])
-            device_type = device.get_device_info().device_type
-            device_colour = bg_lookup[device_type]
-
-            sample_value = ' / '.join(f"{sample.value} {sample.symbol}" for sample in device_sample)
-            device_elements.append(f'<div class="p-3 mb-2 {device_colour} text-white"><h1>{device_type} : {sample_value}</h1></div>')
-
-        return f"""
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <title>Water quality Probes</title>
-                <meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                <meta http-equiv="refresh" content="10">
-                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-            </head>
-            <body>
-                <div class="p-3 mb-2 bg-secondary text-white">
-                    <h1>SAMPLES</h1>
-                    {''.join(device_elements)}
-                </div>
-            </body>
-            </html>
-        """
+    @app.route('/', methods=['GET'])
+    def redirect_to_index():
+        return send_from_directory(app.static_folder, 'index.html')
 
     @device_ns.route('/')
     class DeviceList(Resource):
