@@ -9,7 +9,7 @@ const path = require('path');
 
 const paths = {
   src: path.resolve(__dirname, 'src'),
-  build: path.resolve(__dirname, 'build')
+  build: path.resolve(__dirname, 'server/static')
 }
 
 const htmlConfig = {

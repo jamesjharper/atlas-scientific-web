@@ -1,22 +1,20 @@
 {
   "name": "atlas-scientific-device-webserver",
-  "version": "0.1.0",
-  "author": "Yale DH Lab",
-  "license": "MIT",
-  "description": "Minimal boilerplate for a Flask + React application",
-  "main": "server/server.js",
+  "version": "1.0.0",
+  "author": "James Harper",
+  "license": "GNU",
+  "description": "",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/duhaime/react-boilerplate.git"
+    "url": "git+https://github.com/jamesjharper/atlas-scientific-i2c-microservice.git"
   },
   "scripts": {
     "start": "webpack-dev-server --port 7081 --history-api-fallback --mode=development",
     "build": "webpack --config webpack.config.js --mode=production",
-    "compress": "webpack --config webpack.config.js --mode=production",
     "production": "npm run build && npm run serve",
-    "serve": "cd ./api/ & pipenv run hosted",
+    "serve": "cd ./server/ & pipenv run hosted",
     "lint-js": "eslint -c './src/config/.eslintrc.js' src/",
-    "lint-py": "pylint api/app.py",
+    "lint-py": "pylint server/app.py",
     "lint": "npm run lint-js && npm run lint-py",
     "jest": "jest",
     "test": "npm run build && npm run lint && npm run jest && pytest"

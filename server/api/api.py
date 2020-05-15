@@ -26,7 +26,7 @@ def create_app(i2cbus =I2CBus()):
     config_logging()
     logging_application_banner()
 
-    app = Flask(__name__, static_folder='../../build')
+    app = Flask(__name__, static_folder='../static')
     CORS(app)
 
     api = Api(app, version='1.0', title='I2C Microserverice',
