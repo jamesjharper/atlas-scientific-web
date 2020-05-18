@@ -55,7 +55,6 @@ def create_app(i2cbus = I2CBusIo()):
 
     @device_ns.route('/')
     class DeviceList(Resource):
-
         @device_ns.marshal_list_with(models.device_info)
         def get(self):
             device_bus.scan_for_devices()
