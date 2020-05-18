@@ -93,7 +93,7 @@ class OrpDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"is_enable": true, "symbol": "mV", "unit": "Oxidation Reduction Potential", "unit_code": "ORP", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"is_enable": true, "symbol": "mV", "unit": "millivolt", "value_type": "float"}]\n', response.data)
 
     # compensation tests
 

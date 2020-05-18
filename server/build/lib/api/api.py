@@ -101,8 +101,7 @@ def create_app(i2cbus = I2CBusIo()):
                     'symbol': sample_output.symbol,
                     'unit': sample_output.unit,
                     'value_type': sample_output.value_type,
-                    'is_enable': sample_output.unit_code in enabled_outputs,
-                    'unit_code': sample_output.unit_code
+                    'is_enable': sample_output.unit_code in enabled_outputs
                 })
 
             return sample_outputs

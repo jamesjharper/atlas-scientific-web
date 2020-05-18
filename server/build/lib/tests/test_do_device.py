@@ -388,7 +388,7 @@ class DoDeviceTests(unittest.TestCase):
 
         # expect a empty json list
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"is_enable": true, "symbol": "%", "unit": "Percent saturation", "unit_code": "%", "value_type": "float"}, {"is_enable": false, "symbol": "mg/L", "unit": "milligram per litre", "unit_code": "MG", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"is_enable": true, "symbol": "%", "unit": "Percent saturation", "value_type": "float"}, {"is_enable": false, "symbol": "mg/L", "unit": "milligram per litre", "value_type": "float"}]\n', response.data)
 
     # configuration tests
 

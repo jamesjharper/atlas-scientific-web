@@ -20,7 +20,7 @@ class EcDeviceTests(unittest.TestCase):
     # sample tests
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value=datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_ec_device_with_ec_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -60,10 +60,10 @@ class EcDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "\u03bcS/cm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "1.2", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "EC", "timestamp": "2020-02-25 23:08:13+00:00", "value": "1.2", "value_type": "float"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value=datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_ec_device_with_tds_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -103,7 +103,7 @@ class EcDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "ppm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "2000", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "T.D.S.", "timestamp": "2020-02-25 23:08:13+00:00", "value": "2000", "value_type": "float"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -146,7 +146,7 @@ class EcDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "ppt", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "\u03bcS", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -189,7 +189,7 @@ class EcDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "S.G.", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float"}]\n', response.data)
 
     # sample output tests
 
@@ -224,10 +224,10 @@ class EcDeviceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         expected_response = '['\
-                '{"is_enable": true, "symbol": "\\u03bcS/cm", "unit": "Conductivity", "unit_code": "EC", "value_type": "float"}, ' \
-                '{"is_enable": false, "symbol": "ppm", "unit": "Total Dissolved Solids", "unit_code": "TDS", "value_type": "float"}, ' \
-                '{"is_enable": false, "symbol": "ppt", "unit": "Salinity", "unit_code": "S", "value_type": "float"}, ' \
-                '{"is_enable": false, "symbol": "", "unit": "Specific Gravity", "unit_code": "SG", "value_type": "float"}' \
+                '{"is_enable": true, "symbol": "EC", "unit": "Conductivity", "value_type": "float"}, ' \
+                '{"is_enable": false, "symbol": "T.D.S.", "unit": "Total Dissolved Solids", "value_type": "float"}, ' \
+                '{"is_enable": false, "symbol": "\\u03bcS", "unit": "microsiemens", "value_type": "float"}, ' \
+                '{"is_enable": false, "symbol": "S.G.", "unit": "Specific Gravity", "value_type": "float"}' \
             ']\n'
 
         self.assertEqual(expected_response.encode('utf8'), response.data)

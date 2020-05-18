@@ -61,10 +61,6 @@ def add_device_models(self):
             description='The the unit of measurement reported by this sample output.',
             example='Percent saturation'
         ), 
-        'unit_code': fields.String(
-            description='The unit code.',
-            example='pH'
-        ), 
         'value_type': fields.String(
             description='Data type of the sample reported by this sample output..',
             example='float'

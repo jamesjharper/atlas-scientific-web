@@ -6,9 +6,8 @@ device_capabilities = {
             "latency":  0.9,
             "output": [
                 {
-                    "symbol": "",
+                    "symbol": "pH",
                     "unit": "Power of Hydrogen",
-                    "unit_code": "pH",
                     "value_type": "float"
                 }
             ],
@@ -70,8 +69,7 @@ device_capabilities = {
             "output": [
                 {
                     "symbol": "mV",
-                    "unit": "Oxidation Reduction Potential",
-                    "unit_code": "ORP",
+                    "unit": "millivolt",
                     "value_type": "float"
                 }
             ],
@@ -111,7 +109,6 @@ device_capabilities = {
                 {
                     "symbol": "%",
                     "unit": "Percent saturation",
-                    "unit_code": "%",
                     "value_type": "float"
                 },
                 {
@@ -185,25 +182,25 @@ device_capabilities = {
             "latency":  0.6,
             "output": [
                 {
-                    "symbol": u'\u03bcS/cm', 
+                    "symbol": "EC", 
                     "unit": "Conductivity",
                     "unit_code": "EC",
                     "value_type": "float"
                 },
                 {
-                    "symbol": "ppm", 
+                    "symbol": "T.D.S.", 
                     "unit": "Total Dissolved Solids",
                     "unit_code": "TDS",
                     "value_type": "float"
                 },
                 {
-                    "symbol": 'ppt', 
-                    "unit": "Salinity",
+                    "symbol": u'\u03bcS', 
+                    "unit": "microsiemens",
                     "unit_code": "S",
                     "value_type": "float"
                 },
                 {
-                    "symbol": "", 
+                    "symbol": "S.G.", 
                     "unit": "Specific Gravity",
                     "unit_code": "SG",
                     "value_type": "float"
@@ -314,7 +311,6 @@ device_capabilities = {
                 {
                     "symbol": "°", 
                     "unit": "Temperature",
-                    "unit_code": "t",
                     "value_type": "float"
                 },
             ],

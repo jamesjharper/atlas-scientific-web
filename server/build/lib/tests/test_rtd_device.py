@@ -92,7 +92,7 @@ class RtdDeviceTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         expected_response = '['\
-                '{"is_enable": true, "symbol": "\\u00b0", "unit": "Temperature", "unit_code": "T", "value_type": "float"}' \
+                '{"is_enable": true, "symbol": "\\u00b0", "unit": "Temperature", "value_type": "float"}' \
             ']\n'
 
         self.assertEqual(expected_response.encode('utf8'), response.data)

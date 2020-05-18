@@ -141,8 +141,8 @@ class Co2DeviceTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         expected_response = '['\
-                '{"is_enable": true, "symbol": "ppm", "unit": "Gaseous CO2", "unit_code": "PPM", "value_type": "int"}, ' \
-                '{"is_enable": true, "symbol": "\\u00b0C", "unit": "Internal device temperature", "unit_code": "T", "value_type": "float"}' \
+                '{"is_enable": true, "symbol": "ppm", "unit": "Gaseous CO2", "value_type": "int"}, ' \
+                '{"is_enable": true, "symbol": "\\u00b0C", "unit": "Internal device temperature", "value_type": "float"}' \
             ']\n'
 
         self.assertEqual(expected_response.encode('utf8'), response.data)
