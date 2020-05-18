@@ -57,7 +57,7 @@ class OrpDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "mV", "timestamp": "2020-02-25 23:08:13+00:00", "value": "209.6", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "mV", "timestamp": "2020-02-25 23:08:13+00:00", "value": "209.6", "value_type": "float", "unit_code": "ORP"}]\n', response.data)
 
     # Sample output tests
 

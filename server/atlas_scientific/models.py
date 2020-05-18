@@ -90,11 +90,12 @@ class AtlasScientificDeviceInfo(object):
         self.vendor = 'atlas-scientific'
 
 class AtlasScientificDeviceSample(object): 
-    def __init__(self, symbol, value, value_type, timestamp):
+    def __init__(self, symbol, value, value_type, timestamp, unit_code):
         self.symbol = symbol
         self.value = value
         self.value_type = value_type
         self.timestamp = timestamp
+        self.unit_code = unit_code
 
     @staticmethod
     def from_expected_device_output(device_response, expected_output_units):
@@ -102,7 +103,7 @@ class AtlasScientificDeviceSample(object):
         unit_index = 0
         for unit in expected_output_units:
             value = device_response.get_field('sample', unit_index)
-            result.append(AtlasScientificDeviceSample(unit.symbol, value, unit.value_type, device_response.response_timestamp))
+            result.append(AtlasScientificDeviceSample(unit.symbol, value, unit.value_type, device_response.response_timestamp, unit.unit_code))
             unit_index = unit_index + 1
         return result
 

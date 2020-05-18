@@ -60,7 +60,7 @@ class EcDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "\u03bcS/cm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "1.2", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "\u03bcS/cm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "1.2", "value_type": "float", "unit_code": "EC"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value=datetime.fromtimestamp(1582672093, timezone.utc))
@@ -103,11 +103,11 @@ class EcDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "ppm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "2000", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "ppm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "2000", "value_type": "float", "unit_code": "TDS"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
-    def test_can_sample_atlas_scientific_ec_device_with_ms_enabled(self, datetime_now_mock, patched_time_sleep):
+    def test_can_sample_atlas_scientific_ec_device_with_us_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
         device_address = 100
@@ -146,7 +146,7 @@ class EcDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "ppt", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "ppt", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float", "unit_code": "S"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -189,7 +189,7 @@ class EcDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float", "unit_code": "SG"}]\n', response.data)
 
     # sample output tests
 

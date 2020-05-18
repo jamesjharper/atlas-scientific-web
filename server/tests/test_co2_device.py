@@ -60,7 +60,7 @@ class Co2DeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "ppm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "800", "value_type": "int"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "ppm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "800", "value_type": "int", "unit_code": "PPM"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -101,7 +101,7 @@ class Co2DeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "\\u00b0C", "timestamp": "2020-02-25 23:08:13+00:00", "value": "30.1", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "\\u00b0C", "timestamp": "2020-02-25 23:08:13+00:00", "value": "30.1", "value_type": "float", "unit_code": "T"}]\n', response.data)
 
 
     # Sample output tests

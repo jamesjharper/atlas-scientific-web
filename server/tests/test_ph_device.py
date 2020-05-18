@@ -56,7 +56,7 @@ class PhDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "", "timestamp": "2020-02-25 23:08:13+00:00", "value": "9.560", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "", "timestamp": "2020-02-25 23:08:13+00:00", "value": "9.560", "value_type": "float", "unit_code": "PH"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -101,7 +101,7 @@ class PhDeviceTests(unittest.TestCase):
             any_order=False)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "", "timestamp": "2020-02-25 23:08:13+00:00", "value": "9.560", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "", "timestamp": "2020-02-25 23:08:13+00:00", "value": "9.560", "value_type": "float", "unit_code": "PH"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     def test_reading_sample_twice_should_only_resolve_device_infomation_once(self, patched_time_sleep):

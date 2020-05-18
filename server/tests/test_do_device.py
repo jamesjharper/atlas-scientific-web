@@ -60,7 +60,7 @@ class DoDeviceTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float"}, {"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float", "unit_code": "MG"}, {"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float", "unit_code": "%"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -148,7 +148,7 @@ class DoDeviceTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float", "unit_code": "%"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
     @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
@@ -192,7 +192,7 @@ class DoDeviceTests(unittest.TestCase):
 
         # expect a empty json list 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float"}]\n', response.data)
+        self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float", "unit_code": "MG"}]\n', response.data)
 
     # Sample output tests
 

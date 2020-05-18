@@ -45,7 +45,11 @@ def add_device_models(self):
         'value_type': fields.String(
             description='Data type of the recorded sample.',
             example='float'
-        ), 
+        ),
+        'unit_code': fields.String(
+            description='The unit code.',
+            example='PH'
+        ),
     })
 
     m.device_sample_output = self.model('device_sample_output', {
@@ -63,7 +67,7 @@ def add_device_models(self):
         ), 
         'unit_code': fields.String(
             description='The unit code.',
-            example='pH'
+            example='PH'
         ), 
         'value_type': fields.String(
             description='Data type of the sample reported by this sample output..',
