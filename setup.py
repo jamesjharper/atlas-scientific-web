@@ -5,8 +5,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="atlas-scientific-web", # Replace with your own username
-    version="0.0.1",
+    name="atlas-scientific-web",
+    version="0.1.0",
     author="James Harper",
     description="A small microservice used to host atlas-scientific devices in a I2C configuration.",
     license='GNU',

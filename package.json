@@ -9,8 +9,8 @@
     "url": "git+https://github.com/jamesjharper/atlas-scientific-i2c-microservice.git"
   },
   "scripts": {
-    "package": "webpack --config webpack.config.js --mode=production",
-    "lint": "eslint -c './src/config/.eslintrc.js' src/",
+    "build": "webpack --config webpack.config.js --mode=production",
+    "lint": "eslint -c './src/static/config/.eslintrc.js' src/static/"
   },
   "dependencies": {
     "@babel/core": "^7.5.5",
