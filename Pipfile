@@ -12,11 +12,14 @@ marshmallow = "==3.5.1"
 [dev-packages]
 parameterized = "==0.7.1"
 pylint = "*"
+setuptools = "*"
+wheel = "*"
 
 [scripts]
-unittests = "python -m unittest discover"
-local = "python run_local.py"
-hosted = "python run_hosted.py"
+unittests = "python -m unittest discover -s ./src/atlas-scientific-web"
+lint = "pylint src/atlas-scientific-web/run_local.py"
+hosted = "python src/atlas-scientific-web/run_hosted.py"
+package = "python setup.py sdist bdist_wheel"
 
 [requires]
 python_version = "3.7"

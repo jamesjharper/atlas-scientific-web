@@ -8,8 +8,8 @@ const webpack = require('webpack');
 const path = require('path');
 
 const paths = {
-  src: path.resolve(__dirname, 'src'),
-  build: path.resolve(__dirname, 'server/static')
+  src: path.resolve(__dirname, 'src/static'),
+  build: path.resolve(__dirname, 'server/atlas-scientific-web/static')
 }
 
 const htmlConfig = {

@@ -22,7 +22,7 @@ def logging_application_banner():
     logging.info('========================')
     logging.info('')
 
-def create_app(i2cbus = I2CBusIo()):
+def create_app(i2cbus=I2CBusIo()):
     config_logging()
     logging_application_banner()
 

@@ -10,11 +10,12 @@ class I2CSessionProvider:
     def __init__(self, bus_io):
         self.bus_io = bus_io
         self.channel_locks_lock = threading.RLock()
+        self.file_lock = threading.RLock()
         self.channel_locks = {}
 
     def acquire_access(self, address, timeout_seconds=30):
         channel_lock = self._get_channel_lock(address)
-        return I2CSession(channel_lock, self.bus_io, address, timeout_seconds)
+        return I2CSession(channel_lock,  self.file_lock, self.bus_io, address, timeout_seconds)
 
     def _get_channel_lock(self, address):
         with self.channel_locks_lock:
@@ -25,10 +26,11 @@ class I2CSessionProvider:
             return channel_lock
 
 class I2CSession:
-    def __init__(self, rx_tx_lock, bus_io, address, timeout_seconds):
+    def __init__(self, rx_tx_lock, file_lock, bus_io, address, timeout_seconds):
         self.address = address
         self.bus_io = bus_io
         self.timeout_seconds = timeout_seconds
+        self.file_lock = file_lock
         self.rx_tx_lock = rx_tx_lock
 
     def __enter__(self):
@@ -39,13 +41,16 @@ class I2CSession:
         self.rx_tx_lock.release()
 
     def ping(self):
-        return self.bus_io.ping(self.address)
+        with self.file_lock:
+            return self.bus_io.ping(self.address)
 
     def read(self):
-        return self.bus_io.read(self.address)
+        with self.file_lock:
+            return self.bus_io.read(self.address)
 
     def write(self, value):
-        return self.bus_io.write(self.address, value)
+        with self.file_lock:
+            return self.bus_io.write(self.address, value)
 
 # TODO: implement this for windows if needed, otherwise this is just for running unit tests
 if platform == "win32" or platform == "win64":

@@ -138,8 +138,6 @@ class AtlasScientificDevice(object):
 
     def set_enabled_output_measurements(self, units):
         # find all the measurements which currently are enabled, and need to be disabled
-
-        # TODO: this doesnt feel correct, should ideally be enabling by something other then unit code
         supported_units = set(m.unit_code for m in self.get_supported_output_measurements())
         current_enabled_units = set(m.unit_code for m in self.get_enabled_output_measurements())
         requested_units_to_enable = set((u.upper() for u in units))
@@ -264,7 +262,7 @@ class AtlasScientificDevice(object):
         # Lock access to this device address to prevent
         # interleaving of reads and writes
         with self.i2c_session_provider.acquire_access(self.address) as i2c_session:
-            self.device_log.debug(f' TX   >> {}', query_bytes)
+            self.device_log.debug(' TX   >> {}', query_bytes)
             i2c_session.write(query_bytes)
 
             # back off by 1/3 when data not ready
@@ -283,11 +281,11 @@ class AtlasScientificDevice(object):
             raise AtlasScientificDeviceNotReadyError
 
     def __wait_and_read(self, process_delay, i2c_session):
-        self.device_log.debug(f' WAIT :: {}', process_delay)
+        self.device_log.debug(' WAIT :: {}', process_delay)
         time.sleep(process_delay)
 
         data = i2c_session.read()
-        self.device_log.debug(f' RX   << {}', data)
+        self.device_log.debug(' RX   << {}', data)
 
         response = AtlasScientificResponse(data, get_datetime_now(timezone.utc))
         if response.status == RequestResult.SYNTAX_ERROR:
