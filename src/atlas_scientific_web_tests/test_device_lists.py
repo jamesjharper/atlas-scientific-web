@@ -1,9 +1,12 @@
 import unittest
 from unittest.mock import Mock, call, patch
-from atlas_scientific.device import AtlasScientificDeviceBus
+from datetime import datetime, timezone
 
-import api
-from i2c import I2CBusIo
+from atlas_scientific_web.hardware.device import AtlasScientificDeviceBus
+from atlas_scientific_web.hardware.i2c import I2CBusIo
+from atlas_scientific_web.api import create_app
+
+date_time_patch = 'atlas_scientific_web.hardware.device.get_datetime_now'
 
 class DevicesTests(unittest.TestCase):
  
@@ -13,7 +16,7 @@ class DevicesTests(unittest.TestCase):
         self.i2cbus.write = Mock()
         self.i2cbus.ping = Mock()
 
-        self.app = api.create_app(self.i2cbus).test_client()
+        self.app = create_app(self.i2cbus).test_client()
  
     def test_can_return_empty_list_of_devices(self):
         # Arrange

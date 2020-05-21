@@ -1,9 +1,10 @@
 import unittest
-import api
 from unittest.mock import Mock, patch
-
 from parameterized import parameterized
-from i2c import I2CBusIo
+
+from atlas_scientific_web.hardware.device import AtlasScientificDeviceBus
+from atlas_scientific_web.hardware.i2c import I2CBusIo
+from atlas_scientific_web.api import create_app
 
 class ModelValidationTests(unittest.TestCase):
  
@@ -13,7 +14,7 @@ class ModelValidationTests(unittest.TestCase):
         self.i2cbus.write = Mock()
         self.i2cbus.ping = Mock() 
         
-        self.app = api.create_app(self.i2cbus).test_client()
+        self.app = create_app(self.i2cbus).test_client()
 
     @parameterized.expand([
         [

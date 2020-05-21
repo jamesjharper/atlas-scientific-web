@@ -1,11 +1,12 @@
 import unittest
 from unittest.mock import Mock, call, patch
-
-from atlas_scientific.device import AtlasScientificDeviceBus
 from datetime import datetime, timezone
-import api
 
-from i2c import I2CBusIo
+from atlas_scientific_web.hardware.device import AtlasScientificDeviceBus, get_datetime_now
+from atlas_scientific_web.hardware.i2c import I2CBusIo
+from atlas_scientific_web.api import create_app
+
+date_time_patch = 'atlas_scientific_web.hardware.device.get_datetime_now'
 
 class AnyDeviceErrorTests(unittest.TestCase):
  
@@ -15,10 +16,10 @@ class AnyDeviceErrorTests(unittest.TestCase):
         self.i2cbus.write = Mock()
         self.i2cbus.ping = Mock() 
         
-        self.app = api.create_app(self.i2cbus).test_client()
+        self.app = create_app(self.i2cbus).test_client()
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_should_retry_sample_atlas_scientific_ph_device_if_receive_device_not_ready_response(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -60,7 +61,7 @@ class AnyDeviceErrorTests(unittest.TestCase):
         self.assertEqual(b'[{"symbol": "", "timestamp": "2020-02-25 23:08:13+00:00", "value": "9.56", "value_type": "float", "unit_code": "PH"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_should_return_device_not_ready_error_if_sample_atlas_scientific_ph_device_if_receive_device_not_ready_response_for_more_then_four_tries(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -108,7 +109,7 @@ class AnyDeviceErrorTests(unittest.TestCase):
         self.assertEqual(b'{"message": "Device did not return the expected response in a timely mannor.", "error_code": "DEVICE_NOT_READY"}\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_should_return_error_if_sample_atlas_scientific_ph_device_returns_syntax_error(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -147,7 +148,7 @@ class AnyDeviceErrorTests(unittest.TestCase):
         self.assertEqual(b'{"message": "Device has rejected your request, please confrim the request is supported by the device and the device has the latest firmware.", "error_code": "COMMAND_ERROR"}\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_should_return_device_not_found_error_if_no_device_exists_at_address(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -166,7 +167,7 @@ class AnyDeviceErrorTests(unittest.TestCase):
         self.assertEqual(b'{"message": "No device is connected to the given address.", "error_code": "DEVICE_NOT_FOUND"}\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_should_return_device_not_recognized_error_when_device_response_is_novel(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -201,7 +202,7 @@ class AnyDeviceErrorTests(unittest.TestCase):
         self.assertEqual(b'{"message": "Detected unsupported atlas scientific device.", "error_code": "UNSUPPORTED_DEVICE"}\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_should_return_device_not_supported_error_when_response_does_not_match_any_known_device(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange

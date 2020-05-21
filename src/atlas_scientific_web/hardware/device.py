@@ -1,10 +1,9 @@
-#!flask/bin/python
 import logging
 import time
 import sys
 
 from datetime import datetime, timezone
-from i2c import I2CBusIo, I2CSessionProvider
+from .i2c import I2CBusIo, I2CSessionProvider
 from .models import *
 from .capabilities import get_device_capabilities
 import sys
@@ -113,7 +112,7 @@ class AtlasScientificDevice(object):
         self.__query(f'{parameter.command},{value}', self.device_request_latency)
 
     def get_enabled_output_measurements(self):
-        if self.current_output_measurements is not None:
+        if self.current_output_measurements != None:
             return self.current_output_measurements
 
         # non output device
@@ -146,7 +145,7 @@ class AtlasScientificDevice(object):
         units_to_enable = requested_units_to_enable - current_enabled_units
         unsupported_units = units_to_enable - supported_units
 
-        if not len(unsupported_units) is 0:
+        if len(unsupported_units) != 0:
             raise RequestValidationError
 
         for unit in units_to_enable:

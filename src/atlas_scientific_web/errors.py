@@ -2,7 +2,8 @@ import logging
 
 from flask_restx import Namespace, Resource, fields
 from marshmallow import ValidationError, Schema, post_load, fields as m_fields
-from atlas_scientific.models import RequestValidationError, \
+
+from .hardware.models import RequestValidationError, \
     AtlasScientificDeviceNotYetSupported, \
     AtlasScientificResponseSyntaxError, \
     AtlasScientificNoDeviceAtAddress, \

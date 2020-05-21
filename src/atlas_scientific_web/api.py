@@ -9,8 +9,8 @@ from flask_cors import CORS
 from .models import add_device_models
 from .errors import add_device_errors
 
-from i2c import I2CBusIo, I2CSessionProvider
-from atlas_scientific.device import AtlasScientificDeviceBus
+from .hardware.i2c import I2CBusIo, I2CSessionProvider
+from .hardware.device import AtlasScientificDeviceBus
 
 def config_logging():
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -25,8 +25,8 @@ def logging_application_banner():
 def create_app(i2cbus=I2CBusIo()):
     config_logging()
     logging_application_banner()
-
-    app = Flask(__name__, static_folder='../static')
+    
+    app = Flask(__name__, static_folder='./static')
     CORS(app)
 
     api = Api(app, version='1.0', title='I2C Microserverice',
@@ -144,7 +144,5 @@ def create_app(i2cbus=I2CBusIo()):
             device.set_configuration_parameter(configuration_parameter)
 
             return '', 200
-
-    
 
     return app

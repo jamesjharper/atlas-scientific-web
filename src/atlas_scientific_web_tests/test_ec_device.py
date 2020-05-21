@@ -1,11 +1,12 @@
 import unittest
 from unittest.mock import Mock, call, patch
-
-from atlas_scientific.device import AtlasScientificDeviceBus
 from datetime import datetime, timezone
-import api
 
-from i2c import I2CBusIo
+from atlas_scientific_web.hardware.device import AtlasScientificDeviceBus
+from atlas_scientific_web.hardware.i2c import I2CBusIo
+from atlas_scientific_web.api import create_app
+
+date_time_patch = 'atlas_scientific_web.hardware.device.get_datetime_now'
 
 class EcDeviceTests(unittest.TestCase):
  
@@ -15,12 +16,12 @@ class EcDeviceTests(unittest.TestCase):
         self.i2cbus.write = Mock()
         self.i2cbus.ping = Mock() 
         
-        self.app = api.create_app(self.i2cbus).test_client()
+        self.app = create_app(self.i2cbus).test_client()
 
     # sample tests
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value=datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value=datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_ec_device_with_ec_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -63,7 +64,7 @@ class EcDeviceTests(unittest.TestCase):
         self.assertEqual(b'[{"symbol": "\u03bcS/cm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "1.2", "value_type": "float", "unit_code": "EC"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value=datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value=datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_ec_device_with_tds_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -106,7 +107,7 @@ class EcDeviceTests(unittest.TestCase):
         self.assertEqual(b'[{"symbol": "ppm", "timestamp": "2020-02-25 23:08:13+00:00", "value": "2000", "value_type": "float", "unit_code": "TDS"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_ec_device_with_us_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -149,7 +150,7 @@ class EcDeviceTests(unittest.TestCase):
         self.assertEqual(b'[{"symbol": "ppt", "timestamp": "2020-02-25 23:08:13+00:00", "value": "50000", "value_type": "float", "unit_code": "S"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_ec_device_with_sg_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange

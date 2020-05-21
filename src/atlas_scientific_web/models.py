@@ -1,6 +1,6 @@
 from flask_restx import Api, Resource, fields, Namespace
 from marshmallow import ValidationError, Schema, post_load, fields as m_fields
-from atlas_scientific.models import \
+from .hardware.models import \
     AtlasScientificDeviceCompensationFactor, \
     AtlasScientificDeviceCalibrationPoint, \
     AtlasScientificDeviceConfigurationParameter

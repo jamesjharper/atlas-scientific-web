@@ -1,10 +1,12 @@
 import unittest
 from unittest.mock import Mock, call, patch
-
-from atlas_scientific.device import AtlasScientificDeviceBus
 from datetime import datetime, timezone
-import api
-from i2c import I2CBusIo
+
+from atlas_scientific_web.hardware.device import AtlasScientificDeviceBus
+from atlas_scientific_web.hardware.i2c import I2CBusIo
+from atlas_scientific_web.api import create_app
+
+date_time_patch = 'atlas_scientific_web.hardware.device.get_datetime_now'
 
 class DoDeviceTests(unittest.TestCase):
  
@@ -14,12 +16,12 @@ class DoDeviceTests(unittest.TestCase):
         self.i2cbus.write = Mock()
         self.i2cbus.ping = Mock() 
         
-        self.app = api.create_app(self.i2cbus).test_client()
+        self.app = create_app(self.i2cbus).test_client()
 
     # Sample tests
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_do_device_with_all_output_units_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -63,7 +65,7 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(b'[{"symbol": "mg/L", "timestamp": "2020-02-25 23:08:13+00:00", "value": "238.15", "value_type": "float", "unit_code": "MG"}, {"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float", "unit_code": "%"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_do_device_with_no_output_units_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -107,7 +109,7 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(b'[]\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_do_device_with_only_percent_saturation_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange
@@ -151,7 +153,7 @@ class DoDeviceTests(unittest.TestCase):
         self.assertEqual(b'[{"symbol": "%", "timestamp": "2020-02-25 23:08:13+00:00", "value": "419.6", "value_type": "float", "unit_code": "%"}]\n', response.data)
 
     @patch('time.sleep', return_value=None)
-    @patch('atlas_scientific.device.get_datetime_now', return_value = datetime.fromtimestamp(1582672093, timezone.utc))
+    @patch(date_time_patch, return_value = datetime.fromtimestamp(1582672093, timezone.utc))
     def test_can_sample_atlas_scientific_do_device_with_only_mg_enabled(self, datetime_now_mock, patched_time_sleep):
 
         # Arrange

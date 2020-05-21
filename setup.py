@@ -5,16 +5,19 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="atlas-scientific-web",
+    name="atlas_scientific_web",
     version="0.1.0",
     author="James Harper",
     description="A small microservice used to host atlas-scientific devices in a I2C configuration.",
     license='GNU',
     url="https://github.com/jamesjharper/atlas-scientific-web",
-    packages=find_namespace_packages(where="src"),
+    packages=find_namespace_packages(
+        where="src", 
+        exclude=["atlas_scientific_web_tests"]
+    ),
     package_dir={"": "src"},
     package_data={
-        "atlas-scientific-web/static": ["*.html", "*.js", "*.css"],
+        "atlas_scientific_web.static": ["*.html", "*.js", "*.css"],
     },
     classifiers=[
 
