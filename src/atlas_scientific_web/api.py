@@ -31,7 +31,7 @@ def attach_exit_handler(i2cbus):
         logging.info(' Service stop')
         logging.info('========================')
         
-
+    signal.signal(signal.SIGINT, on_exit)
     signal.signal(signal.SIGTERM, on_exit)
 
 def create_app(i2cbus=I2CBusIo()):

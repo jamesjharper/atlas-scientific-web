@@ -106,8 +106,13 @@ else:
             self.file_write.write(value)
 
         def close(self):
-            self.file_read.close()
-            self.file_write.close()
+            if self.file_read:
+                self.file_read.close()
+            self.file_read = None
+
+            if self.file_write:
+                self.file_write.close()
+            self.file_write = None
 
         def __enter__(self):
             return self

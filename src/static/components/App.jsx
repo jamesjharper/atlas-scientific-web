@@ -39,7 +39,7 @@ class Device extends React.Component {
     super()
     this.state = { samples: [
         {
-          'value': '...',
+          'value': '',
           'symbol': ''
         }
       ] 
