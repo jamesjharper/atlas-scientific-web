@@ -9,7 +9,7 @@ const path = require('path');
 
 const paths = {
   src: path.join(__dirname, './src/static/'), 
-  build: path.join(__dirname, '/src/atlas-scientific-web/static')
+  build: path.join(__dirname, '/src/atlas_scientific_web/static')
 }
 
 module.exports = {

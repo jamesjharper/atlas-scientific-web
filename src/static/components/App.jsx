@@ -1,42 +1,67 @@
 import React from 'react';
 
-const testData = [
-  {type: "ORP", samples: [{ value: "141", symbol: "mV"}]},
-  {type: "PH", samples: [{ value: "7.1", symbol: ""}]},
-  {type: "RTD", samples: [{ value: "30", symbol: ""}]},
-  {type: "EC", samples: [{ value: "904", symbol: "uS"}]},
-  {type: "DO", samples: [{ value: "5.0", symbol: "mg/L"}, { value: "53", symbol: "%"}]},
-];
-
 class App extends React.Component {
-  state = {
-    devices: testData,
-  };
-  
 	render() {
   	return (
     	<div>
     	  <div className="header">{this.props.title}</div>
-        <DeviceList devices={this.state.devices} />
+        <DeviceList />
     	</div>
     );
   }	
 }
 
-const DeviceList = (props) => (
-	<div>
-  	{props.devices.map(device => <Device {...device}/>)}
-	</div>
-);
+class DeviceList extends React.Component {
+
+  constructor() {
+    super()
+    this.state = { devices: [] }
+  }
+
+  componentDidMount() {
+    fetch('/api/device')
+      .then(result => result.json())
+      .then(result => this.setState({ devices: result }));
+  }
+
+  render() {
+  	return (
+      <div>
+        {this.state.devices.map(device => <Device {...device}/>)}
+      </div>
+    );
+  }
+}
 
 class Device extends React.Component {
+
+  constructor() {
+    super()
+    this.state = { samples: [] }
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(() => this.sampleDevice(), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer)
+    this.timer = null;
+  }
+
+  sampleDevice() {
+    fetch('/api/device/' + this.props.address + '/sample')
+      .then(result => result.json())
+      .then(result => this.setState({ samples: result }));
+  }
+
   render() {
   	const device = this.props;
   	return (
     	<div>
-        <h1 className={'p-3 mb-2 text-white ' + device.type.toLowerCase() + '_device'}>{device.type} : 
+        <h1 className={'p-3 mb-2 text-white ' + device.device_type.toLowerCase() + '_device'}>{device.device_type} : 
           {
-            device.samples
+            this.state.samples
                   .map(sample => <DeviceSample {...sample}/>)
                   .reduce((prev, curr) => [prev, ' ', curr])
           }
@@ -52,8 +77,5 @@ const DeviceSample = (props) => {
   } 
   return (<React.Fragment>{props.value}</React.Fragment>);
 }
-
-  
-  
 
 export default App;

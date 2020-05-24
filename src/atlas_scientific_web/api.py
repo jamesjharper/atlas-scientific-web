@@ -57,7 +57,7 @@ def create_app(i2cbus=I2CBusIo()):
     class DeviceList(Resource):
         @device_ns.marshal_list_with(models.device_info)
         def get(self):
-            device_bus.scan_for_devices()
+            device_bus.get_known_devices()
             i2c_devices = []
             for device in device_bus.get_known_devices():
                 device_info = device.get_device_info()
