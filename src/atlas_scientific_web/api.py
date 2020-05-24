@@ -1,4 +1,4 @@
-import os
+import signal, os
 import logging
 import sys
 
@@ -20,9 +20,18 @@ def logging_application_banner():
     logging.info('========================')
     logging.info('I2C Microserverice start')
     logging.info('========================')
-    logging.info('')
+    logging.info('') 
+
+def attach_exit_handler(i2cbus):
+    def on_exit(signum, frame):
+        i2cbus.close()
+
+    signal.signal(signal.SIGTERM, on_exit)
 
 def create_app(i2cbus=I2CBusIo()):
+
+    
+    attach_exit_handler(i2cbus)
     config_logging()
     logging_application_banner()
     

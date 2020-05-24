@@ -75,6 +75,12 @@ if platform == "win32" or platform == "win64":
         def close(self):
             pass
 
+        def __enter__(self):
+            return self
+
+        def __exit__(self, type, value, traceback):
+            self.close()
+
 else:
     import fcntl
     I2C_SLAVE = 0x703
@@ -102,3 +108,9 @@ else:
         def close(self):
             self.file_read.close()
             self.file_write.close()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, type, value, traceback):
+            self.close()
