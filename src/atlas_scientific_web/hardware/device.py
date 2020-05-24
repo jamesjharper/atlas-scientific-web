@@ -78,7 +78,7 @@ class AtlasScientificDevice(object):
                 device_log.info('Non supported atlas scientific device found.')
                 raise err
             except Exception as err:
-                device_log.debug(f'Failed to connection device, {err}')
+                device_log.debug(f'Failed to connection device, {err}', )
                 device_log.info('non atlas scientific device found')
                 raise err
 
@@ -261,7 +261,7 @@ class AtlasScientificDevice(object):
         # Lock access to this device address to prevent
         # interleaving of reads and writes
         with self.i2c_session_provider.acquire_access(self.address) as i2c_session:
-            self.device_log.debug(' TX   >> {}', query_bytes)
+            self.device_log.debug(f' TX   >> {query_bytes}')
             i2c_session.write(query_bytes)
 
             # back off by 1/3 when data not ready
@@ -280,11 +280,11 @@ class AtlasScientificDevice(object):
             raise AtlasScientificDeviceNotReadyError
 
     def __wait_and_read(self, process_delay, i2c_session):
-        self.device_log.debug(' WAIT :: {}', process_delay)
+        self.device_log.debug(f' WAIT :: {process_delay}')
         time.sleep(process_delay)
 
         data = i2c_session.read()
-        self.device_log.debug(' RX   << {}', data)
+        self.device_log.debug(f' RX   << {data}')
 
         response = AtlasScientificResponse(data, get_datetime_now(timezone.utc))
         if response.status == RequestResult.SYNTAX_ERROR:
