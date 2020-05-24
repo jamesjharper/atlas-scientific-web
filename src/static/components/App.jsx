@@ -37,7 +37,13 @@ class Device extends React.Component {
 
   constructor() {
     super()
-    this.state = { samples: [] }
+    this.state = { samples: [
+        {
+          'value': '...',
+          'symbol': ''
+        }
+      ] 
+    }
   }
 
   componentDidMount() {
