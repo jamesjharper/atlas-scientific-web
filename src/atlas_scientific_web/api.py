@@ -18,19 +18,23 @@ def config_logging():
 def logging_application_banner():
     logging.info('')
     logging.info('========================')
-    logging.info('I2C Microserverice start')
+    logging.info(' Service start')
     logging.info('========================')
     logging.info('') 
 
 def attach_exit_handler(i2cbus):
     def on_exit(signum, frame):
+
+        logging.info('release i2c bus handle')
         i2cbus.close()
+        logging.info('========================')
+        logging.info(' Service stop')
+        logging.info('========================')
+        
 
     signal.signal(signal.SIGTERM, on_exit)
 
 def create_app(i2cbus=I2CBusIo()):
-
-    
     attach_exit_handler(i2cbus)
     config_logging()
     logging_application_banner()
