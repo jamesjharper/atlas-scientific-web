@@ -41,6 +41,7 @@ class Device extends React.Component {
   }
 
   componentDidMount() {
+    this.sampleDevice()
     this.timer = setInterval(() => this.sampleDevice(), 1000);
   }
 
