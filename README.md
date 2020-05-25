@@ -1,5 +1,5 @@
 # Atlas Scientific Web 
-Atlas Scientific Web is a lightweight Rest API and Web UI for sampling and managing Atlas Scientific embedded solutions. 
+Atlas Scientific Web is a lightweight Rest API and Web UI for sampling and managing Atlas Scientific embedded devices. 
 
 - Devices are required to be configured as using I2C. 
 - Intended to run on a Raspberry PI 
