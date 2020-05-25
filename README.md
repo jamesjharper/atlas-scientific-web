@@ -102,8 +102,8 @@ To develope Server API source python 3.7 and pipenv are required.
 Installing required packages
 ```
 pipenv install -dev
-
 ```
+
 Run unit tests 
 ```
 pipenv run unittests
