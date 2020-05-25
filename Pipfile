@@ -9,15 +9,18 @@ flask-cors = "==3.0.3"
 flask-restx = "==0.2.0"
 marshmallow = "==3.5.1"
 
-
 [dev-packages]
 parameterized = "==0.7.1"
 pylint = "*"
+setuptools = "*"
+wheel = "*"
 
 [scripts]
-unittests = "python -m unittest discover"
-local = "python run_local.py"
-hosted = "python run_hosted.py"
+unittests = "python -m unittest discover -s ./src/"
+lint = "pylint src/atlas_scientific_web/run_local.py"
+serve_dev = "python -m src.atlas_scientific_web.serve_dev"
+serve_prod = "waitress-serve --listen=localhost:8080 --call 'src.atlas_scientific_web:create_app'"
+package = "python setup.py sdist bdist_wheel"
 
 [requires]
 python_version = "3.7"
