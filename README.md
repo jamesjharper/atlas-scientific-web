@@ -76,7 +76,7 @@ pipenv run serve_prod
 ```
 
 ## Running as dev
-For development and hardware debugging, `atlas_scientific_web` can be run using `flask`. Flask is not intended for production environments. Flask its not advised to be used with `atlas_scientific_web` in multi client environments due to the long running nature of requests to Atlas Scientific embedded solutions. 
+For development and hardware debugging, `atlas_scientific_web` can be run using `flask`. Flask is not intended for production environments. Flask its not advised to be used with `atlas_scientific_web` in multi client environments due to the long running nature of requests to Atlas Scientific embedded devices. 
 
 To start the web service with 
 ```
