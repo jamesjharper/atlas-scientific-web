@@ -11,19 +11,15 @@ The `atlas_scientific_web` pip package in not published at this time, however a 
 ## Building Wheel from source 
 To build from source python 3.7 and pipenv are required. 
 
-
-1: Pull source code either by downloading as a zip from github, or clone the git repo with,
 ```
+# Pull source code either by downloading as a zip from github, or clone the git repo with,
 git clone https://github.com/jamesjharper/atlas-scientific-web.git
-```
+cd atlas-scientific-web
 
-2: Insure required packages are installed with,
-```
+# Insure required packages are installed with
 pipenv install -dev
-```
 
-3: Build package with,
-```
+# Build package with,
 pipenv run package
 ```
 
