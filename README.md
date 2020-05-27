@@ -1,16 +1,26 @@
 # Atlas Scientific Web 
-Atlas Scientific Web is a lightweight Rest API and Web UI for sampling and managing Atlas Scientific embedded solutions. 
+Atlas Scientific Web is a lightweight Rest API and Web UI for sampling and managing Atlas Scientific embedded solutions. At this time, hardware must be in a I2C configuration and running unix based operating system.
 
-- Devices are required to be configured as using I2C. 
-- Intended to run on a Raspberry PI 
-- Requires Linux
+# Currently Supported Hardware
+- [EZO-pH Circuit](https://www.atlas-scientific.com/circuits/ezo-ph-circuit/)
+- [EZO-ORP Circuit](https://www.atlas-scientific.com/circuits/ezo-orp-circuit/)
+- [EZO-DO Circuit](https://www.atlas-scientific.com/circuits/ezo-dissolved-oxygen-circuit/)
+- [EZO-EC Circuit](https://www.atlas-scientific.com/circuits/ezo-conductivity-circuit/)
+- [EZO-CO2 Circuit](https://www.atlas-scientific.com/probes/ezo-co2-embedded-ndir-carbon-dioxide-sensor/)
+- [EZO-RTD Circuit](hhttps://www.atlas-scientific.com/circuits/ezo-rtd-temperature-circuit/)
+
+# Verified to work with
+In addition to comprehensive unit test coverage, all supported EZO circuit are verified to work with
+- Raspberry PI 3 model b+
+- Raspbian Buster Lite
+- Python 3.7
+- [Tentacle T3 for Raspberry Pi](https://www.whiteboxes.ch/shop/tentacle-t3-for-raspberry-pi/)
 
 # Installing from Wheel package
 The `atlas_scientific_web` pip package in not published at this time, however a wheel package can be built from source.
 
 ## Building Wheel from source 
 To build from source python 3.7 and pipenv are required. 
-
 
 Pull source code either by downloading as a zip from github, or clone the git repo with,
 ```
