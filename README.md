@@ -7,7 +7,7 @@ Atlas Scientific Web is a lightweight Rest API and Web UI for sampling and manag
 - [EZO-DO Circuit](https://www.atlas-scientific.com/circuits/ezo-dissolved-oxygen-circuit/)
 - [EZO-EC Circuit](https://www.atlas-scientific.com/circuits/ezo-conductivity-circuit/)
 - [EZO-CO2 Circuit](https://www.atlas-scientific.com/probes/ezo-co2-embedded-ndir-carbon-dioxide-sensor/)
-- [EZO-RTD Circuit](hhttps://www.atlas-scientific.com/circuits/ezo-rtd-temperature-circuit/)
+- [EZO-RTD Circuit](https://www.atlas-scientific.com/circuits/ezo-rtd-temperature-circuit/)
 
 # Verified to work with
 In addition to comprehensive unit test coverage, all supported EZO circuit are verified to work with
